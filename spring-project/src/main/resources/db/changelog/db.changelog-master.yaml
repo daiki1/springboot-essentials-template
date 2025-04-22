@@ -1,0 +1,10 @@
+databaseChangeLog:
+  #This is the way to include other changelogs in XML format
+  #- include:
+  #    file: db/changelog/schema/changelog-001-init-tables.xml
+  #    relativeToChangelogFile: true
+  #This is the way to include other changelogs in YAML format
+  - include:
+      file: db/changelog/schema/changelog-001-init-tables.yaml
+  - include:
+      file: db/changelog/schema/changelog-002-init-data.yaml

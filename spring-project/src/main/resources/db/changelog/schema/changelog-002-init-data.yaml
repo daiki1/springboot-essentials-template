@@ -1,0 +1,77 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-insert-roles
+      author: Omar
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ADMIN
+              - column:
+                  name: description
+                  value: Full access to the system.
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: AUDITOR
+              - column:
+                  name: description
+                  value: Read-only access to audit and system logs.
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: USER
+              - column:
+                  name: description
+                  value: Access to standard CRUD operations.
+
+  - changeSet:
+      id: 002-insert-admin-user
+      author: Omar
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: "$2a$10$tEStEnCrYptEdPaSsWorDExample123456" # replace with real BCrypt
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: created_at
+                  valueDate: 2025-04-22 00:00:00
+              - column:
+                  name: updated_at
+                  valueDate: 2025-04-22 00:00:00
+              - column:
+                  name: created_by
+                  value: admin
+              - column:
+                  name: updated_by
+                  value: admin
+
+  - changeSet:
+      id: 003-link-admin-user-to-role
+      author: Omar
+      changes:
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: role_id
+                  value: 1
