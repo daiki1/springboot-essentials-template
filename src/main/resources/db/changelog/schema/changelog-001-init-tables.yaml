@@ -29,29 +29,31 @@ databaseChangeLog:
                   type: VARCHAR(100)
                   constraints:
                     nullable: false
-                    unique: true
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active_token
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
               - column:
                   name: created_at
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP
-                  constraints:
-                    nullable: false
               - column:
                   name: updated_at
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP
-                  constraints:
-                    nullable: false
               - column:
                   name: created_by
-                  type: VARCHAR(100)
-                  constraints:
-                    nullable: true
+                  type: VARCHAR(255)
               - column:
                   name: updated_by
-                  type: VARCHAR(100)
-                  constraints:
-                    nullable: true
+                  type: VARCHAR(255)
 
   - changeSet:
       id: 002-create-roles-table

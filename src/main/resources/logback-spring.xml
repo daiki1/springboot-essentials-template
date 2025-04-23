@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a Logback configuration file for a Spring Boot application. It configures a rolling file appender that creates log files with a specific naming pattern and retention policy. -->
+<!-- This will roll over your log files daily, and each day’s log file will be limited to 10 MB. Older logs are kept for 30 days. -->
+<configuration>
+    <!-- Define a console appender for logging to the console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Define a rolling file appender -->
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/application.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Roll over the log file every day, and also if it exceeds 10MB -->
+            <fileNamePattern>logs/application-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <!-- Keep logs for 30 days -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <!-- Customize the log format -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set the root logging level and specify the appender -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ROLLING" />
+    </root>
+
+
+
+</configuration>

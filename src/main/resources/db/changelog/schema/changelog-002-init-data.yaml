@@ -45,7 +45,7 @@ databaseChangeLog:
                   value: admin
               - column:
                   name: password
-                  value: "$2a$10$tEStEnCrYptEdPaSsWorDExample123456" # replace with real BCrypt
+                  value: "$2a$10$at5hhq9SSN8kb06srp6BXeQMhkj9Q4C1.59alTN.74VnCTjtWSkvC"
               - column:
                   name: email
                   value: admin@example.com

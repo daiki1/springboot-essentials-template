@@ -115,6 +115,10 @@ spring.liquibase.enabled=false
 - src/main/resources/db/changelog: Liquibase changelogs
 - src/main/resources/messages_{lang}.properties: Internationalization files (i18n)
 
+## Cors
+- CORS is enabled for all origins in `CorsConfig.java`.
+- You can customize it to restrict access to specific domains.
+
 ## Internationalization
 - Messages are loaded from messages_en.properties, messages_es.properties, etc.
 - Customize Spring messages (like validation or login errors) based on user locale.
@@ -166,6 +170,14 @@ spring.liquibase.enabled=false
 - Instead, use Liquibase to manage your database schema.
 - Make sure to create all the tables manually in the changelog.
 - Using ddl-auto=true in production can lead to data loss or corruption.
+
+## Avoid using default passwords
+- Do not use default passwords in production.
+
+## Avoid using "*" for CORS
+- In production, you should restrict CORS to specific domains.
+- Using "*" allows any domain to access your API, which can be a security risk.
+- Update the CORS configuration CorsConfig.java to allow only trusted domains.
 
 
 </details>
