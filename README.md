@@ -70,8 +70,8 @@ Production-ready Spring Boot REST API project to kickstart any backend applicati
 ### 1. Clone the Repository
 
 ``` bash
-git clone https://github.com/yourusername/springboot-api-starter-template.git
-cd springboot-api-starter-template
+git clone https://github.com/daiki1/springboot-essentials-template.git
+cd springboot-essentials-template
 ```
 
 ### 2. Configure the Database
