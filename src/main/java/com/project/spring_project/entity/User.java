@@ -32,6 +32,7 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean enabled = true;
 
