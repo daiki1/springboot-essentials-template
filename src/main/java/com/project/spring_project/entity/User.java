@@ -30,6 +30,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

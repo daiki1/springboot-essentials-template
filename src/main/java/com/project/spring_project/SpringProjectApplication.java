@@ -37,6 +37,7 @@ public class SpringProjectApplication implements CommandLineRunner{
 		logger.info("Spring Boot Version: {}", SpringBootVersion.getVersion());
 		logger.info("Active Profiles: {}", env.getActiveProfiles().length > 0 ?
 				String.join(", ", env.getActiveProfiles()) : "none");
+		logger.info("==== App Ready! ====");
 	}
 
 }

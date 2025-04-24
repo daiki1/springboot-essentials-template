@@ -96,6 +96,15 @@ mvn spring-boot:run
 <details>
 <summary>Click to open: This section includes helpful notes, practices, and important instructions to consider during development:</summary>
 
+## Unit tests
+- Use the command below to run all unit tests:
+``` bash
+mvn test
+```
+
+## User for testing
+- The first user is admin with role `ROLE_ADMIN` and password `admin`.
+
 ## Table Management
 - This project uses Liquibase for managing database schema changes.
 - The project could use JPA hibernate to create tables automatically during development, however, this is not recommended for production and liquidbase requires to create all the tables manually to work on production. 

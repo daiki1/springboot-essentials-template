@@ -14,12 +14,14 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
                 //"http://localhost:4200",         // Angular/React dev
                 //"http://yourdomain.com",         // Same server
                 //"http://another-frontend.com",   // External server
                 //"*"                              // Allow all origins for testing purposes
         ));
+        //You can test if its working by using the following command and uncommenting the line above "http://yourdomain.com"
+        // curl -H "Origin: http://yourdomain.com" --verbose http://localhost:8080/api/test/all
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With"));

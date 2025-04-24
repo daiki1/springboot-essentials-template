@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.project.spring_project.util.ErrorResponseUtil.buildErrorResponse;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @Value("${spring.profiles.active:}")
@@ -25,21 +27,22 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringProjectApplication.class);
 
-    // Method to build a standard error response
-    private Map<String, Object> buildErrorResponse(HttpStatus status, String message) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("message", message);
-        return body;
-    }
-
     // Method to log errors based on the active profile
     private void logError(String exception, String message) {
         if ("dev".equalsIgnoreCase(activeProfile))
             logger.error("{}: {}", exception, message);
     }
+
+    // Handle token expiration
+    /*
+    This exception is handled in the JwtAuthenticationEntryPoint class
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<Object> handleJwtAuthenticationException(JwtAuthenticationException ex) {
+        logError("JwtAuthenticationException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage())
+                , HttpStatus.UNAUTHORIZED);
+    }*/
 
     // Handle error 401 unauthorized
     @ExceptionHandler(AuthenticationException.class)
@@ -88,15 +91,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 buildErrorResponse(HttpStatus.BAD_REQUEST,"Malformed JSON request.")
                 , HttpStatus.BAD_REQUEST);
-    }
-
-    // Handle token expiration
-    @ExceptionHandler(JwtAuthenticationException.class)
-    public ResponseEntity<Object> handleJwtAuthenticationException(JwtAuthenticationException ex) {
-        logError("JwtAuthenticationException", ex.getMessage());
-        return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid or expired token.")
-                , HttpStatus.UNAUTHORIZED);
     }
 
     // Optional: handle all other exceptions

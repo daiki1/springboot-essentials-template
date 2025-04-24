@@ -1,18 +1,16 @@
 package com.project.spring_project.secutrity.jwt;
 
-import com.project.spring_project.entity.User;
 import com.project.spring_project.exception.JwtAuthenticationException;
-import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.services.CustomUserDetails;
 import com.project.spring_project.secutrity.services.UserDetailsServiceImpl;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -31,8 +29,13 @@ public class JwtAuthenticationFilter extends GenericFilter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+
+    public JwtAuthenticationFilter(UserDetailsServiceImpl userDetailsService,
+                                   JwtAuthenticationEntryPoint authenticationEntryPoint) {
+        this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -44,8 +47,12 @@ public class JwtAuthenticationFilter extends GenericFilter {
             CustomUserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             String activeToken = userDetails.getUser().getActiveToken();
-            if(oneSingleSignOn && (activeToken==null && !jwt.equals(userDetails.getUser().getActiveToken()))){
-                throw new JwtAuthenticationException("Invalid or expired session");
+            if(oneSingleSignOn && (activeToken==null || !jwt.equals(userDetails.getUser().getActiveToken()))){
+                SecurityContextHolder.clearContext();
+                HttpServletRequest httpRequest = (HttpServletRequest) request;
+                HttpServletResponse httpResponse = (HttpServletResponse) response;
+                authenticationEntryPoint.commence(httpRequest, httpResponse, new JwtAuthenticationException("Invalid or expired session"));
+                return; // STOP filter chain
             }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
