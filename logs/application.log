@@ -984,3 +984,204 @@
 2025-04-24 00:38:56 - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-04-24 00:38:56 - HikariPool-3 - Shutdown initiated...
 2025-04-24 00:38:56 - HikariPool-3 - Shutdown completed.
+2025-04-24 00:40:48 - HV000001: Hibernate Validator 8.0.2.Final
+2025-04-24 00:40:48 - Starting AuthControllerTest using Java 21.0.6 with PID 9480 (started by OmarU in C:\GitHub\springboot-essentials-template)
+2025-04-24 00:40:48 - The following 1 profile is active: "dev"
+2025-04-24 00:40:48 - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@ecfbe91
+2025-04-24 00:40:49 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-24 00:40:49 - Finished Spring Data repository scanning in 75 ms. Found 1 JPA repository interface.
+2025-04-24 00:40:50 - HikariPool-1 - Starting...
+2025-04-24 00:40:50 - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@21f91efa
+2025-04-24 00:40:50 - HikariPool-1 - Start completed.
+2025-04-24 00:40:52 - Reading from mydatabase.databasechangelog
+2025-04-24 00:40:52 - Database is up to date, no changesets to execute
+2025-04-24 00:40:52 - Reading from mydatabase.databasechangelog
+2025-04-24 00:40:52 - UPDATE SUMMARY
+2025-04-24 00:40:52 - Run:                          0
+2025-04-24 00:40:52 - Previously run:               6
+2025-04-24 00:40:52 - Filtered out:                 0
+2025-04-24 00:40:52 - -------------------------------
+2025-04-24 00:40:52 - Total change sets:            6
+2025-04-24 00:40:52 - Update summary generated
+2025-04-24 00:40:52 - Command execution complete
+2025-04-24 00:40:52 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-24 00:40:52 - HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-04-24 00:40:52 - HHH000026: Second-level cache disabled
+2025-04-24 00:40:52 - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-24 00:40:52 - HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2025-04-24 00:40:52 - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 5.5.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-24 00:40:53 - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-24 00:40:53 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-24 00:40:54 - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2025-04-24 00:40:54 - 7 mappings in 'requestMappingHandlerMapping'
+2025-04-24 00:40:54 - Default resource handling disabled
+2025-04-24 00:40:54 - Exposing 1 endpoint beneath base path '/actuator'
+2025-04-24 00:40:55 - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-04-24 00:40:55 - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-04-24 00:40:55 - Mapping filters: webMvcObservationFilter urls=[/*] order=-2147483647, springSecurityFilterChain urls=[/*] order=-100, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, jwtAuthenticationFilter urls=[/*] order=2147483647
+2025-04-24 00:40:55 - Mapping servlets: 
+2025-04-24 00:40:55 - Filter 'webMvcObservationFilter' configured for use
+2025-04-24 00:40:55 - Initializing Spring TestDispatcherServlet ''
+2025-04-24 00:40:55 - Initializing Servlet ''
+2025-04-24 00:40:55 - Completed initialization in 1 ms
+2025-04-24 00:40:55 - Started AuthControllerTest in 7.978 seconds (process running for 9.259)
+2025-04-24 00:40:55 - ==== App Started ====
+2025-04-24 00:40:55 - Java Version: 21.0.6
+2025-04-24 00:40:55 - Current Time: 2025-04-24T00:40:55.866541400
+2025-04-24 00:40:55 - OS: Windows 10
+2025-04-24 00:40:55 - OS Version: 10.0
+2025-04-24 00:40:55 - Architecture: amd64
+2025-04-24 00:40:55 - JVM Max Memory: 4086 MB
+2025-04-24 00:40:55 - JVM Available Processors: 8
+2025-04-24 00:40:55 - Spring Boot Version: 3.4.4
+2025-04-24 00:40:55 - Active Profiles: dev
+2025-04-24 00:40:55 - ==== App Ready! ====
+2025-04-24 00:40:56 - Mapped to com.project.spring_project.controller.TestController#publicEndpoint()
+2025-04-24 00:40:56 - Using 'text/plain', given [*/*] and supported [text/plain, */*, application/json, application/*+json]
+2025-04-24 00:40:56 - Writing ["This is a public endpoint. Everyone can see this."]
+2025-04-24 00:40:56 - Mapped to com.project.spring_project.controller.AuthController#login(AuthRequest)
+2025-04-24 00:40:56 - Read "application/json;charset=UTF-8" to [com.project.spring_project.payload.request.AuthRequest@317c16bd]
+2025-04-24 00:40:57 - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-04-24 00:40:57 - Writing [com.project.spring_project.payload.response.AuthResponse@5834390e]
+2025-04-24 00:40:57 - Mapped to com.project.spring_project.controller.TestController#userEndpoint()
+2025-04-24 00:40:57 - Using @ExceptionHandler com.project.spring_project.exception.GlobalExceptionHandler#handleAccessDenied(AccessDeniedException)
+2025-04-24 00:40:57 - AccessDeniedException: Access Denied
+2025-04-24 00:40:57 - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-04-24 00:40:57 - Writing [{error=Forbidden, message=You do not have permission to access this resource., timestamp=2025-04-24T (truncated)...]
+2025-04-24 00:40:57 - Resolved [org.springframework.security.authorization.AuthorizationDeniedException: Access Denied]
+2025-04-24 00:40:57 - Mapped to com.project.spring_project.controller.AuthController#login(AuthRequest)
+2025-04-24 00:40:57 - Read "application/json;charset=UTF-8" to [com.project.spring_project.payload.request.AuthRequest@9a4bb97]
+2025-04-24 00:40:57 - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-04-24 00:40:57 - Writing [com.project.spring_project.payload.response.AuthResponse@673e239b]
+2025-04-24 00:40:57 - Mapped to com.project.spring_project.controller.TestController#adminEndpoint()
+2025-04-24 00:40:57 - Using 'text/plain', given [*/*] and supported [text/plain, */*, application/json, application/*+json]
+2025-04-24 00:40:57 - Writing ["This endpoint is only for admins."]
+2025-04-24 00:40:57 - Mapped to com.project.spring_project.controller.AuthController#login(AuthRequest)
+2025-04-24 00:40:57 - Read "application/json;charset=UTF-8" to [com.project.spring_project.payload.request.AuthRequest@595f803]
+2025-04-24 00:40:57 - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-04-24 00:40:57 - Writing [com.project.spring_project.payload.response.AuthResponse@3789bd95]
+2025-04-24 00:40:57 - Could not detect default configuration classes for test class [com.project.spring_project.JwtTokenProviderTest]: JwtTokenProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-04-24 00:40:57 - Found @SpringBootConfiguration com.project.spring_project.SpringProjectApplication for test class com.project.spring_project.JwtTokenProviderTest
+2025-04-24 00:40:57 - Restart disabled due to context in which it is running
+2025-04-24 00:40:57 - Starting JwtTokenProviderTest using Java 21.0.6 with PID 9480 (started by OmarU in C:\GitHub\springboot-essentials-template)
+2025-04-24 00:40:57 - The following 1 profile is active: "dev"
+2025-04-24 00:40:57 - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@27946cee
+2025-04-24 00:40:57 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-24 00:40:57 - Finished Spring Data repository scanning in 15 ms. Found 1 JPA repository interface.
+2025-04-24 00:40:58 - HikariPool-2 - Starting...
+2025-04-24 00:40:58 - HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1b4d4949
+2025-04-24 00:40:58 - HikariPool-2 - Start completed.
+2025-04-24 00:40:58 - Reading from mydatabase.databasechangelog
+2025-04-24 00:40:58 - Database is up to date, no changesets to execute
+2025-04-24 00:40:58 - UPDATE SUMMARY
+2025-04-24 00:40:58 - Run:                          0
+2025-04-24 00:40:58 - Previously run:               6
+2025-04-24 00:40:58 - Filtered out:                 0
+2025-04-24 00:40:58 - -------------------------------
+2025-04-24 00:40:58 - Total change sets:            6
+2025-04-24 00:40:58 - Update summary generated
+2025-04-24 00:40:58 - Command execution complete
+2025-04-24 00:40:58 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-24 00:40:58 - HHH000026: Second-level cache disabled
+2025-04-24 00:40:58 - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-24 00:40:58 - HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2025-04-24 00:40:58 - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+	Database driver: undefined/unknown
+	Database version: 5.5.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-24 00:40:58 - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-24 00:40:58 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-24 00:40:58 - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2025-04-24 00:40:58 - 7 mappings in 'requestMappingHandlerMapping'
+2025-04-24 00:40:58 - Default resource handling disabled
+2025-04-24 00:40:58 - Exposing 1 endpoint beneath base path '/actuator'
+2025-04-24 00:40:58 - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-04-24 00:40:58 - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-04-24 00:40:58 - Started JwtTokenProviderTest in 1.605 seconds (process running for 12.452)
+2025-04-24 00:40:58 - ==== App Started ====
+2025-04-24 00:40:58 - Java Version: 21.0.6
+2025-04-24 00:40:58 - Current Time: 2025-04-24T00:40:58.984207500
+2025-04-24 00:40:58 - OS: Windows 10
+2025-04-24 00:40:58 - OS Version: 10.0
+2025-04-24 00:40:58 - Architecture: amd64
+2025-04-24 00:40:58 - JVM Max Memory: 4086 MB
+2025-04-24 00:40:58 - JVM Available Processors: 8
+2025-04-24 00:40:58 - Spring Boot Version: 3.4.4
+2025-04-24 00:40:58 - Active Profiles: dev
+2025-04-24 00:40:58 - ==== App Ready! ====
+2025-04-24 00:40:59 - Could not detect default configuration classes for test class [com.project.spring_project.SpringProjectApplicationTests]: SpringProjectApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-04-24 00:40:59 - Found @SpringBootConfiguration com.project.spring_project.SpringProjectApplication for test class com.project.spring_project.SpringProjectApplicationTests
+2025-04-24 00:40:59 - Restart disabled due to context in which it is running
+2025-04-24 00:40:59 - Starting SpringProjectApplicationTests using Java 21.0.6 with PID 9480 (started by OmarU in C:\GitHub\springboot-essentials-template)
+2025-04-24 00:40:59 - The following 1 profile is active: "dev"
+2025-04-24 00:40:59 - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@5bdf8295
+2025-04-24 00:41:00 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-24 00:41:00 - Finished Spring Data repository scanning in 29 ms. Found 1 JPA repository interface.
+2025-04-24 00:41:00 - HikariPool-3 - Starting...
+2025-04-24 00:41:00 - HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@422910a6
+2025-04-24 00:41:00 - HikariPool-3 - Start completed.
+2025-04-24 00:41:00 - Reading from mydatabase.databasechangelog
+2025-04-24 00:41:00 - Database is up to date, no changesets to execute
+2025-04-24 00:41:00 - UPDATE SUMMARY
+2025-04-24 00:41:00 - Run:                          0
+2025-04-24 00:41:00 - Previously run:               6
+2025-04-24 00:41:00 - Filtered out:                 0
+2025-04-24 00:41:00 - -------------------------------
+2025-04-24 00:41:00 - Total change sets:            6
+2025-04-24 00:41:00 - Update summary generated
+2025-04-24 00:41:00 - Command execution complete
+2025-04-24 00:41:00 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-24 00:41:00 - HHH000026: Second-level cache disabled
+2025-04-24 00:41:00 - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-24 00:41:00 - HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2025-04-24 00:41:00 - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
+	Database driver: undefined/unknown
+	Database version: 5.5.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-24 00:41:00 - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-24 00:41:00 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-24 00:41:00 - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2025-04-24 00:41:01 - 7 mappings in 'requestMappingHandlerMapping'
+2025-04-24 00:41:01 - Default resource handling disabled
+2025-04-24 00:41:01 - Exposing 1 endpoint beneath base path '/actuator'
+2025-04-24 00:41:01 - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-04-24 00:41:01 - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-04-24 00:41:01 - Started SpringProjectApplicationTests in 2.561 seconds (process running for 15.359)
+2025-04-24 00:41:01 - ==== App Started ====
+2025-04-24 00:41:01 - Java Version: 21.0.6
+2025-04-24 00:41:01 - Current Time: 2025-04-24T00:41:01.890443100
+2025-04-24 00:41:01 - OS: Windows 10
+2025-04-24 00:41:01 - OS Version: 10.0
+2025-04-24 00:41:01 - Architecture: amd64
+2025-04-24 00:41:01 - JVM Max Memory: 4086 MB
+2025-04-24 00:41:01 - JVM Available Processors: 8
+2025-04-24 00:41:01 - Spring Boot Version: 3.4.4
+2025-04-24 00:41:01 - Active Profiles: dev
+2025-04-24 00:41:01 - ==== App Ready! ====
+2025-04-24 00:41:01 - Closing org.springframework.web.context.support.GenericWebApplicationContext@ecfbe91, started on Thu Apr 24 00:40:48 CST 2025
+2025-04-24 00:41:01 - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-24 00:41:01 - HikariPool-1 - Shutdown initiated...
+2025-04-24 00:41:01 - HikariPool-1 - Shutdown completed.
+2025-04-24 00:41:01 - Closing org.springframework.web.context.support.GenericWebApplicationContext@27946cee, started on Thu Apr 24 00:40:57 CST 2025
+2025-04-24 00:41:01 - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-24 00:41:01 - HikariPool-2 - Shutdown initiated...
+2025-04-24 00:41:01 - HikariPool-2 - Shutdown completed.
+2025-04-24 00:41:01 - Closing org.springframework.web.context.support.GenericWebApplicationContext@5bdf8295, started on Thu Apr 24 00:40:59 CST 2025
+2025-04-24 00:41:01 - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-24 00:41:01 - HikariPool-3 - Shutdown initiated...
+2025-04-24 00:41:01 - HikariPool-3 - Shutdown completed.

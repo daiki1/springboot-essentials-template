@@ -67,6 +67,6 @@ public class AuthControllerTest {
     public void shouldNotAccessAdminEndpointWithoutToken() throws Exception {
         mockMvc.perform(get("/api/test/user")
                 .header("Authorization", "Bearer " + getToken()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 }
