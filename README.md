@@ -15,6 +15,7 @@ Production-ready Spring Boot REST API project to kickstart any backend applicati
 - Maven-based project structure
 - MySQL Database Integration
 - JWT Authentication & Role-Based Access Control
+- Single session login or multiple sessions configurable in `application.properties` 
 - DTO Mapping with MapStruct
 - RESTful API with CRUD examples
 - Auditing for all database operations (create, update, delete, login)
@@ -77,20 +78,39 @@ cd springboot-essentials-template
 ### 2. Configure the Database
 - Database will be created automatically if it does not exist.
 - Update the `application.properties` file with your database credentials.
-- User table will be created automatically. The first user is admin with role `ROLE_ADMIN` and password `admin123`.
-
+- User table will be created automatically. The first user is admin with role `ROLE_ADMIN` and password `admin`.
+- The first user has id 2, the id 1 is reserved for test purposes using Unit tests.
 ``` properties
 spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
 
-### 3. Run the application
+### 3. Configurable session login for users
+- You can configure the session login in `application.properties` file.
+- By default, the application is configured to allow only one session per user. If you want to allow multiple sessions, set the following property to `false`:
+- When login in with a new session, the old session will be invalidated if the following property is `true`
+``` properties
+app.oneSingleSignOn=false
+```
+
+### 4. Run the application
 
 The application can be run using Maven. Make sure you have the required dependencies installed.
 ``` bash
 mvn spring-boot:run
 ```
+### 5. Refresh token
+- The application uses JWT for authentication. The token is valid for 15 minutes by default.
+- You can refresh the token using the `/api/auth/refresh` endpoint.
+- The refresh token is valid for 7 days by default.
+- You can change the expiration time in `application.properties` file.
+``` properties
+app.jwtExpirationInMs=900000
+app.jwtRefreshExpirationMs=604800000
+```
+- Everytime the token expires, call the `/api/auth/refresh` endpoint to get a new token using the refresh token.
+- If the refresh token expires, you will need to login again to get a new access token and refresh token.
 
 # B. While Developing
 <details>

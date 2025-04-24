@@ -45,7 +45,7 @@ databaseChangeLog:
                   value: admin
               - column:
                   name: password
-                  value: "$2a$10$at5hhq9SSN8kb06srp6BXeQMhkj9Q4C1.59alTN.74VnCTjtWSkvC"
+                  value: "$2a$10$at5hhq9SSN8kb06srp6BXeQMhkj9Q4C1.59alTN.74VnCTjtWSkvC" # bcrypt hash for "admin"
               - column:
                   name: email
                   value: admin@example.com
@@ -71,7 +71,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: user_id
-                  value: 1
+                  value: 2
               - column:
                   name: role_id
                   value: 1

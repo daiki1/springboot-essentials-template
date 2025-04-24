@@ -1,18 +1,23 @@
 package com.project.spring_project.secutrity.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.project.spring_project.entity.User;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -23,6 +28,16 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private long jwtExpirationInMs;
 
+    @Value("${app.jwtIssuer}")
+    private String jwtIssuer;
+
+    @Value("${app.jwtAudience}")
+    private String jwtAudience;
+
+    @Value("${app.jwtRefreshExpirationMs}")
+    private long refreshExpirationInMs;
+
+    @Getter
     private SecretKey key;
 
     @PostConstruct
@@ -51,10 +66,20 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
-                .setIssuer("your-issuer")          // Add issuer
-                .setAudience("your-audience")      // Add audience
+                .setIssuer(jwtIssuer)          // Add issuer
+                .setAudience(jwtAudience)      // Add audience
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String generateToken(User user) {
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+
+        return generateToken(authentication); // delegate to your existing method
     }
 
     // Method to get the expiration date of the token
@@ -68,10 +93,16 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
-        Claims claims = getClaims(token);
-        return !isTokenExpired(token)
-                && claims.getIssuer().equals("your-issuer")
-                && claims.getAudience().equals("your-audience");
+        try {
+            Claims claims = getClaims(token);
+            return !isTokenExpired(token)
+                    && claims.getIssuer().equals(jwtIssuer)
+                    && claims.getAudience().equals(jwtAudience);
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException |
+                 ExpiredJwtException |
+                 SignatureException ex) {
+            return false;
+        }
     }
 
     public String getUsernameFromJWT(String token) {
@@ -94,6 +125,20 @@ public class JwtTokenProvider {
         System.out.println("Audience: " + claims.getAudience());
         System.out.println("Issued At: " + claims.getIssuedAt());
         System.out.println("Expiration: " + claims.getExpiration());
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        String username = authentication.getName();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshExpirationInMs); // define this in config
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .setIssuer(jwtIssuer)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
 }

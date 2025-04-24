@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -17,16 +18,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "/sql/insert-test-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/sql/delete-test-user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private final String requestBody = "{\"username\": \"testuser_121_unitTest_unique_username39\", \"password\": \"admin\"}";
+
     private String getToken() throws Exception {
-        String requestBody = "{\"username\": \"admin\", \"password\": \"admin\"}";
 
         MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(this.requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists())
                 .andReturn();
@@ -40,11 +44,9 @@ public class AuthControllerTest {
 
     @Test
     public void loginShouldReturnToken() throws Exception {
-        String requestBody = "{\"username\": \"admin\", \"password\": \"admin\"}";
-
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(this.requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists());
     }
@@ -69,4 +71,38 @@ public class AuthControllerTest {
                 .header("Authorization", "Bearer " + getToken()))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void loginWithInvalidCredentialsShouldFail() throws Exception {
+        String invalidRequest = "{\"username\": \"admin\", \"password\": \"wrongpassword\"}";
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequest))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginWithMissingFields() throws Exception {
+        String missingUsername = "{\"password\": \"admin\"}";
+        String missingPassword = "{\"username\": \"admin\"}";
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(missingUsername))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(missingPassword))
+                .andExpect(status().isBadRequest());
+
+        String requestBody = "{}"; // empty JSON
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest()); // now expects 400
+    }
+
 }

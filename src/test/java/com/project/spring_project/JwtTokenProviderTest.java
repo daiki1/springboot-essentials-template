@@ -3,6 +3,11 @@ package com.project.spring_project;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.TestPropertySource;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,5 +72,31 @@ public class JwtTokenProviderTest {
         assertEquals("testuser", username);
     }
 
+    @Test
+    void testTokenExpiration() {
+        String token = Jwts.builder()
+                .setSubject("user")
+                .setExpiration(new Date(System.currentTimeMillis() - 1000)) // already expired
+                .signWith(jwtTokenProvider.getKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+        assertFalse(jwtTokenProvider.validateToken(token));
+    }
+
+    @Test
+    void testInvalidSignature() {
+        String token = Jwts.builder()
+                .setSubject("user")
+                .signWith(Keys.hmacShaKeyFor("WrongSecretKeyForTesting1234567890".getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
+                .compact();
+
+        assertFalse(jwtTokenProvider.validateToken(token));
+    }
+
+    @Test
+    void testNullOrBlankToken() {
+        assertFalse(jwtTokenProvider.validateToken(null));
+        assertFalse(jwtTokenProvider.validateToken(""));
+    }
 
 }
