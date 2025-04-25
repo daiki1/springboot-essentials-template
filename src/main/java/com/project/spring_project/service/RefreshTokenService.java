@@ -7,6 +7,7 @@ import com.project.spring_project.payload.response.AuthResponse;
 import com.project.spring_project.repository.RefreshTokenRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
+import com.project.spring_project.util.TokenUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtService;
     private final UserRepository userRepository;
+
 
     public RefreshTokenService(RefreshTokenRepository tokenRepository, JwtTokenProvider jwtService, UserRepository userRepository) {
         this.refreshTokenRepository = tokenRepository;
@@ -62,9 +64,11 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String jwt = jwtService.generateToken(user);
+        String encodedToken = TokenUtils.hashedToken(jwt);
+
         RefreshToken newToken = createRefreshToken(user);
 
-        user.setActiveToken(jwt);
+        user.setActiveToken(encodedToken);
         userRepository.save(user);
 
         return new AuthResponse(jwt, newToken.getRawToken());

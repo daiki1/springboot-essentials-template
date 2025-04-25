@@ -1,6 +1,7 @@
 package com.project.spring_project;
 
 import com.project.spring_project.entity.RefreshToken;
+import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.payload.request.RefreshTokenRequest;
 import com.project.spring_project.repository.RefreshTokenRepository;
@@ -12,26 +13,56 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@Transactional
 public class RefreshTokenServiceTest {
-    private RefreshTokenRepository refreshTokenRepository;
-    private RefreshTokenService refreshTokenService;
+    private RefreshTokenRepository refreshTokenRepositoryMock;
+    private RefreshTokenService refreshTokenServiceMock;
+    private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    public RefreshTokenServiceTest(UserRepository userRepository, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository) {
+        this.userRepository = userRepository;
+        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @BeforeEach
     void setup() {
-        refreshTokenRepository = mock(RefreshTokenRepository.class);
+        refreshTokenRepositoryMock = mock(RefreshTokenRepository.class);
         JwtTokenProvider jwtService = mock(JwtTokenProvider.class);
-        UserRepository userRepository = mock(UserRepository.class);
-        refreshTokenService = new RefreshTokenService(refreshTokenRepository, jwtService, userRepository);
+        UserRepository userRepositoryMock = mock(UserRepository.class);
+        refreshTokenServiceMock = new RefreshTokenService(refreshTokenRepositoryMock, jwtService, userRepositoryMock);
+    }
+
+    private RefreshToken createAndSaveToken(User user, boolean isUsed, Instant expiry) {
+        String rawToken = UUID.randomUUID().toString();
+        String hash = TokenUtils.hashedToken(rawToken);
+
+        RefreshToken token = new RefreshToken();
+        token.setUser(user);
+        token.setUsed(isUsed);
+        token.setExpiryDate(expiry);
+        token.setTokenHash(hash);
+        token.setRawToken(rawToken); // Only for testing, not stored in DB
+
+        return refreshTokenRepository.save(token);
     }
 
     @Test
@@ -45,12 +76,66 @@ public class RefreshTokenServiceTest {
         token.setExpiryDate(Instant.now().minusSeconds(10));
         token.setUsed(false);
 
-        when(refreshTokenRepository.findByTokenHash(hashed)).thenReturn(Optional.of(token));
+        when(refreshTokenRepositoryMock.findByTokenHash(hashed)).thenReturn(Optional.of(token));
 
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken(rawToken);
 
+        assertThrows(RuntimeException.class, () -> refreshTokenServiceMock.refreshAccessToken(request));
+    }
+
+    @Sql(scripts = "/sql/insert-test-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/delete-test-user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Test
+    void refreshAccessToken_usedToken_shouldThrow() {
+        // Given: A token that's marked as used
+        User user = userRepository.findByUsername("testuser_121_unitTest_unique_username39")
+                .orElseThrow( () -> new RuntimeException("User not found"));
+
+        RefreshToken usedToken = createAndSaveToken(user, true, Instant.now().plus(15, ChronoUnit.MINUTES));
+
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken(usedToken.getRawToken());
+
+        // When / Then
         assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+    }
+
+    @Test
+    void refreshAccessToken_invalidToken_shouldThrow() {
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken("non-existent-token");
+
+        assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+    }
+
+    @Test
+    void refreshAccessToken_blankToken_shouldThrow() {
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken("");
+
+        assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+    }
+
+    @Sql(scripts = "/sql/insert-test-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/delete-test-user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Test
+    void cleanOldRefreshTokens_shouldDeleteExpiredOrUsed() {
+        User user = userRepository.findByUsername("testuser_121_unitTest_unique_username39")
+                .orElseThrow( () -> new RuntimeException("User not found"));
+        // Given: one expired, one used, one valid
+        createAndSaveToken(user, true, Instant.now().plus(15, ChronoUnit.MINUTES)); // used
+        createAndSaveToken(user, false, Instant.now().minus(40, ChronoUnit.DAYS)); // expired
+        createAndSaveToken(user, false, Instant.now().plus(15, ChronoUnit.MINUTES)); // valid
+
+        // When
+        refreshTokenService.cleanOldRefreshTokens();
+
+        // Then
+        List<RefreshToken> tokens = refreshTokenRepository.findAllByUser(user);
+        assertEquals(1, tokens.size());
+        assertFalse(tokens.get(0).isUsed());
+        assertTrue(tokens.get(0).getExpiryDate().isAfter(Instant.now()));
     }
 
 }

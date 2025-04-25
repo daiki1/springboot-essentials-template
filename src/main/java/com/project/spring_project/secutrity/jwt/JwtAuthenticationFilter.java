@@ -3,6 +3,7 @@ package com.project.spring_project.secutrity.jwt;
 import com.project.spring_project.exception.JwtAuthenticationException;
 import com.project.spring_project.secutrity.services.CustomUserDetails;
 import com.project.spring_project.secutrity.services.UserDetailsServiceImpl;
+import com.project.spring_project.util.TokenUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends GenericFilter {
@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
     private UserDetailsServiceImpl userDetailsService;
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
+
 
     public JwtAuthenticationFilter(UserDetailsServiceImpl userDetailsService,
                                    JwtAuthenticationEntryPoint authenticationEntryPoint) {
@@ -47,7 +48,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
             CustomUserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             String activeToken = userDetails.getUser().getActiveToken();
-            if(oneSingleSignOn && (activeToken==null || !jwt.equals(userDetails.getUser().getActiveToken()))){
+            if(oneSingleSignOn && (activeToken==null || !TokenUtils.hashedToken(jwt).equals(userDetails.getUser().getActiveToken()))){//!EncoderUtil.matches(jwt, userDetails.getUser().getActiveToken())
                 SecurityContextHolder.clearContext();
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
                 HttpServletResponse httpResponse = (HttpServletResponse) response;
