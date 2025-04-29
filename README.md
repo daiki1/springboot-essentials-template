@@ -78,7 +78,8 @@ cd springboot-essentials-template
 ### 2. Configure the Database
 - Database will be created automatically if it does not exist.
 - Update the `application.properties` file with your database credentials.
-- User table will be created automatically. The first user is admin with role `ROLE_ADMIN` and password `admin`.
+- User table will be created automatically. The first user is admin with role `ROLE_ADMIN` and no password.
+- Use the reset password endpoint to set the password for the first user. Use: `/api/auth/request-password-reset` check the token generated in `password_reset_tokens` table, and use `/api/auth/reset-password` to set the password. 
 - The first user has id 2, the id 1 is reserved for test purposes using Unit tests.
 ``` properties
 spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name

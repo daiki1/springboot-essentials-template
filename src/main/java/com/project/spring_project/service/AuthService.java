@@ -1,19 +1,31 @@
 package com.project.spring_project.service;
 
+import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.RefreshToken;
+import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.payload.request.AuthRequest;
+import com.project.spring_project.payload.request.RegisterRequest;
 import com.project.spring_project.payload.response.AuthResponse;
+import com.project.spring_project.repository.PasswordResetTokenRepository;
+import com.project.spring_project.repository.RoleRepository;
 import com.project.spring_project.repository.UserRepository;
+import com.project.spring_project.secutrity.services.PasswordService;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
 import com.project.spring_project.secutrity.services.CustomUserDetails;
 import com.project.spring_project.util.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,42 +35,122 @@ public class AuthService {
     private final JwtTokenProvider jwtService;
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordService passwordService;
+    private final RoleRepository roleRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
 
     public AuthResponse login(AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        String token = jwtService.generateToken(authentication);
+        if (user.isAccountLocked()) {
+            if (user.getLockTime() != null && user.getLockTime().isBefore(LocalDateTime.now().minusMinutes(15))) {
+                // Unlock after timeout
+                user.setAccountLocked(false);
+                user.setFailedAttempts(0);
+                user.setLockTime(null);
+                userRepository.save(user);
+            } else {
+                throw new LockedException("Account is locked. Please try again later.");
+            }
+        }
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getUser();
-        String encodedToken = TokenUtils.hashedToken(token);
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
 
-        user.setActiveToken(encodedToken);
-        userRepository.save(user);
+            String token = jwtService.generateToken(authentication);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+            //CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            //User user = userDetails.getUser();
+            String encodedToken = TokenUtils.hashedToken(token);
 
-        return new AuthResponse(token, refreshToken.getRawToken());
+            user.setActiveToken(encodedToken);
+            user.setFailedAttempts(0);
+            user.setAccountLocked(false);
+            user.setLockTime(null);
+            userRepository.save(user);
+
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+            return new AuthResponse(token, refreshToken.getRawToken());
+        } catch (BadCredentialsException ex) {
+            int newFailAttempts = user.getFailedAttempts() + 1;
+            user.setFailedAttempts(newFailAttempts);
+
+            if (newFailAttempts >= 5) {
+                user.setAccountLocked(true);
+                user.setLockTime(LocalDateTime.now());
+            }
+
+            userRepository.save(user);
+
+            throw ex; // rethrow to controller/global exception handler
+        }
     }
 
-    /*public void register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new IllegalArgumentException("Username already taken");
         }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already registered");
+        }
+
+        Role role = roleRepository.findByName("USER")
+                .orElseThrow(() -> new IllegalStateException("Default role USER not found"));
 
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // HASH IT
-        user.setEnabled(true);
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordService.encodePassword(request.getPassword())); // 👈 Hash the password
+        user.setEnabled(true); // or false if you require email verification
+        user.setRoles(Set.of(role));
+
         userRepository.save(user);
-    }*/
+    }
 
+    public void requestPasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(30);
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setExpiryDate(expiry);
+
+        passwordResetTokenRepository.save(resetToken);
+
+        // For now: log it. In prod, send email.
+        System.out.println("Password reset link: https://your-app.com/reset-password?token=" + token);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Token expired");
+        }
+
+        if (resetToken.isUsed()) {
+            throw new IllegalArgumentException("Token already used");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordService.encodePassword(newPassword));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+    }
 }

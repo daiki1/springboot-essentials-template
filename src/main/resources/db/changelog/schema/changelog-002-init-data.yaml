@@ -45,7 +45,7 @@ databaseChangeLog:
                   value: admin
               - column:
                   name: password
-                  value: "$2a$10$at5hhq9SSN8kb06srp6BXeQMhkj9Q4C1.59alTN.74VnCTjtWSkvC" # bcrypt hash for "admin"
+                  value: "" # Request recovery password first time
               - column:
                   name: email
                   value: admin@example.com

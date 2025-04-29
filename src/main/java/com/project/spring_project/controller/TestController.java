@@ -20,7 +20,7 @@ public class TestController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/user")
     public ResponseEntity<String> userEndpoint() {
-        return ResponseEntity.ok("This endpoint is for users, admins, and auditors.");
+        return ResponseEntity.ok("This endpoint is for users.");
     }
 
     // Only accessible to users with role AUDITOR

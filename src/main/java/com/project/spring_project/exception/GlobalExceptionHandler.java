@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,6 +46,59 @@ public class GlobalExceptionHandler {
                 , HttpStatus.UNAUTHORIZED);
     }*/
 
+    //Handle error 400 bad request
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        logError("IllegalArgumentException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    // Handle error 400 validation errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        logError("MethodArgumentNotValidException", ex.getMessage());
+        Map<String, Object> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.BAD_REQUEST, errors.toString())
+                , HttpStatus.BAD_REQUEST);
+    }
+
+    // Handle error 400 malformed JSON request
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleInvalidRequestBody(HttpMessageNotReadableException ex) {
+        logError("HttpMessageNotReadableException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.BAD_REQUEST,"Malformed JSON request.")
+                , HttpStatus.BAD_REQUEST);
+    }
+
+    // Handle error 401 unauthorized
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex) {
+        logError("UsernameNotFoundException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password."),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    // Handle error 401 unauthorized
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        logError("BadCredentialsException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password."),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
     // Handle error 401 unauthorized
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
@@ -70,27 +125,14 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND);
     }
 
-    // Handle error 400 validation errors
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        logError("MethodArgumentNotValidException", ex.getMessage());
-        Map<String, Object> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+    // Handle error 423 locked
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<Object> handleLockedException(LockedException ex) {
+        logError("LockedException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.LOCKED, "Your account is locked. Try again later."),
+                HttpStatus.LOCKED // HTTP 423 Locked
         );
-
-        return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.BAD_REQUEST, errors.toString())
-                , HttpStatus.BAD_REQUEST);
-    }
-
-    // Handle malformed JSON request
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleInvalidRequestBody(HttpMessageNotReadableException ex) {
-        logError("HttpMessageNotReadableException", ex.getMessage());
-        return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.BAD_REQUEST,"Malformed JSON request.")
-                , HttpStatus.BAD_REQUEST);
     }
 
     // Optional: handle all other exceptions

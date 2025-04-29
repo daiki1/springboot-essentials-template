@@ -31,6 +31,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
     @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -59,4 +62,15 @@ public class User {
 
     @Column(name = "updated_by")
     private String updatedBy;
+
+    @Builder.Default
+    @Column(name = "failed_attempts")
+    private int failedAttempts = 0;
+
+    @Builder.Default
+    @Column(name = "account_locked")
+    private boolean accountLocked = false;
+
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
 }

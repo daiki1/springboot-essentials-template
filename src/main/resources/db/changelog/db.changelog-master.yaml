@@ -8,3 +8,5 @@ databaseChangeLog:
       file: db/changelog/schema/changelog-001-init-tables.yaml
   - include:
       file: db/changelog/schema/changelog-002-init-data.yaml
+  - include:
+      file: db/changelog/schema/changelog-003-add-login-security.yaml
