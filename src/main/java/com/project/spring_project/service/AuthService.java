@@ -8,6 +8,7 @@ import com.project.spring_project.payload.request.AuthRequest;
 import com.project.spring_project.payload.request.RegisterRequest;
 import com.project.spring_project.payload.response.AuthResponse;
 import com.project.spring_project.repository.PasswordResetTokenRepository;
+import com.project.spring_project.repository.RefreshTokenRepository;
 import com.project.spring_project.repository.RoleRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.services.PasswordService;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -38,7 +40,8 @@ public class AuthService {
     private final PasswordService passwordService;
     private final RoleRepository roleRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RoleRepository userRoleRepository;
 
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
@@ -152,5 +155,15 @@ public class AuthService {
 
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
+    }
+
+    // This method is used in the test class to delete the test user
+    @Transactional
+    public void deleteTestUser(String username) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user != null) {
+            refreshTokenRepository.deleteByUser(user);
+            userRepository.delete(user);
+        }
     }
 }

@@ -19,4 +19,6 @@ public interface  RefreshTokenRepository extends JpaRepository<RefreshToken, Lon
     void deleteAllExpiredOrUsedBefore(@Param("cutoff") Instant cutoff);
 
     List<RefreshToken> findAllByUser(User user);
+
+    void deleteByUser(User user);
 }

@@ -9,6 +9,7 @@ import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
 import com.project.spring_project.service.RefreshTokenService;
 import com.project.spring_project.util.TokenUtils;
+import com.project.spring_project.utils.TestUserUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +29,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@Transactional
 public class RefreshTokenServiceTest {
+
     private RefreshTokenRepository refreshTokenRepositoryMock;
     private RefreshTokenService refreshTokenServiceMock;
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final TestUserUtil testUserUtil;
 
     @Autowired
-    public RefreshTokenServiceTest(UserRepository userRepository, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository) {
+    public RefreshTokenServiceTest(UserRepository userRepository, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository, TestUserUtil testUserUtil) {
         this.userRepository = userRepository;
         this.refreshTokenService = refreshTokenService;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.testUserUtil = testUserUtil;
     }
 
     @BeforeEach
@@ -84,12 +87,11 @@ public class RefreshTokenServiceTest {
         assertThrows(RuntimeException.class, () -> refreshTokenServiceMock.refreshAccessToken(request));
     }
 
-    @Sql(scripts = "/sql/insert-test-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "/sql/delete-test-user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void refreshAccessToken_usedToken_shouldThrow() {
+        testUserUtil.registerUserIfNotExists();
         // Given: A token that's marked as used
-        User user = userRepository.findByUsername("testuser_121_unitTest_unique_username39")
+        User user = userRepository.findByUsername(testUserUtil.getTestUsername())
                 .orElseThrow( () -> new RuntimeException("User not found"));
 
         RefreshToken usedToken = createAndSaveToken(user, true, Instant.now().plus(15, ChronoUnit.MINUTES));
@@ -99,6 +101,8 @@ public class RefreshTokenServiceTest {
 
         // When / Then
         assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+
+        testUserUtil.deleteTestUser();
     }
 
     @Test
@@ -117,11 +121,12 @@ public class RefreshTokenServiceTest {
         assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
     }
 
-    @Sql(scripts = "/sql/insert-test-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "/sql/delete-test-user.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void cleanOldRefreshTokens_shouldDeleteExpiredOrUsed() {
-        User user = userRepository.findByUsername("testuser_121_unitTest_unique_username39")
+        testUserUtil.deleteTestUser();
+        testUserUtil.registerUserIfNotExists();
+
+        User user = userRepository.findByUsername(testUserUtil.getTestUsername())
                 .orElseThrow( () -> new RuntimeException("User not found"));
         // Given: one expired, one used, one valid
         createAndSaveToken(user, true, Instant.now().plus(15, ChronoUnit.MINUTES)); // used
@@ -134,8 +139,10 @@ public class RefreshTokenServiceTest {
         // Then
         List<RefreshToken> tokens = refreshTokenRepository.findAllByUser(user);
         assertEquals(1, tokens.size());
-        assertFalse(tokens.get(0).isUsed());
-        assertTrue(tokens.get(0).getExpiryDate().isAfter(Instant.now()));
+        assertFalse(tokens.getFirst().isUsed());
+        assertTrue(tokens.getFirst().getExpiryDate().isAfter(Instant.now()));
+
+        testUserUtil.deleteTestUser();
     }
 
 }
