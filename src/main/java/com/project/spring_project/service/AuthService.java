@@ -13,7 +13,6 @@ import com.project.spring_project.repository.RoleRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.services.PasswordService;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
-import com.project.spring_project.secutrity.services.CustomUserDetails;
 import com.project.spring_project.util.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,7 +41,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final RoleRepository userRoleRepository;
+    private final EmailService emailService;
 
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
@@ -123,6 +123,9 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        Optional<PasswordResetToken> existing = passwordResetTokenRepository.findByUserId(user.getId());
+        existing.ifPresent(passwordResetTokenRepository::delete);
+
         String token = UUID.randomUUID().toString();
         LocalDateTime expiry = LocalDateTime.now().plusMinutes(30);
 
@@ -135,6 +138,11 @@ public class AuthService {
 
         // For now: log it. In prod, send email.
         System.out.println("Password reset link: https://your-app.com/reset-password?token=" + token);
+        emailService.sendPlainTextEmail(
+                user.getEmail(),
+                "Password Reset Request",
+                "Click the link to reset your password: https://your-app.com/reset-password?token=" + token
+        );
     }
 
     public void resetPassword(String token, String newPassword) {

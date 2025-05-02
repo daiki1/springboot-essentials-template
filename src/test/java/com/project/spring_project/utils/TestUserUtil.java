@@ -1,11 +1,15 @@
 package com.project.spring_project.utils;
 
+import com.project.spring_project.entity.User;
 import com.project.spring_project.payload.request.RegisterRequest;
 import com.project.spring_project.repository.UserRepository;
+import com.project.spring_project.secutrity.services.PasswordService;
 import com.project.spring_project.service.AuthService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @Getter
@@ -20,8 +24,13 @@ public class TestUserUtil {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final PasswordService passwordService;
 
-    public void registerUserIfNotExists(){
+    public void registerUserIfNotExists() {
+        registerUserIfNotExists(false);
+
+    }
+    public void registerUserIfNotExists(boolean throwException) {
         try {
             RegisterRequest request = new RegisterRequest();
             request.setUsername(testUsername);
@@ -30,12 +39,18 @@ public class TestUserUtil {
 
             authService.register(request);
         } catch (Exception e) {
-            // User already exists, from previous test
+            if (throwException) {
+                throw e;
+            }
         }
     }
 
     public void deleteTestUser() {
         authService.deleteTestUser(testUsername);
+    }
+
+    public Optional<User> fingUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.project.spring_project.secutrity.jwt;
 
 import com.project.spring_project.entity.User;
+import com.project.spring_project.secutrity.services.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -8,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -62,8 +64,17 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationInMs);
 
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", roles)
+                .claim("userId", user.getId())
+                .claim("email", user.getEmail())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .setIssuer(jwtIssuer)          // Add issuer
