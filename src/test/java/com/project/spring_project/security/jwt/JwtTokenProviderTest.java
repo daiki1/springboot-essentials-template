@@ -1,8 +1,9 @@
-package com.project.spring_project;
+package com.project.spring_project.security.jwt;
 
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
+import com.project.spring_project.secutrity.services.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.TestPropertySource;
 
@@ -25,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 @TestPropertySource(properties = "app.jwtSecret=yourTestSecretKey-long.enough.to.be.valid")
 @SpringBootTest
+@Profile("dev")
 public class JwtTokenProviderTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -39,13 +42,16 @@ public class JwtTokenProviderTest {
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("password");
+
         Role role = new Role();
         role.setName("ROLE_USER");
         user.setRoles(Set.of(role));
 
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn(user.getUsername());
-        when(auth.getPrincipal()).thenReturn(user);
+        when(auth.getPrincipal()).thenReturn(userDetails);
 
         String token = jwtTokenProvider.generateToken(auth);
 
@@ -58,13 +64,16 @@ public class JwtTokenProviderTest {
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("password");
+
         Role role = new Role();
         role.setName("ROLE_USER");
         user.setRoles(Set.of(role));
 
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
         Authentication auth = mock(Authentication.class);
         when(auth.getName()).thenReturn(user.getUsername());
-        when(auth.getPrincipal()).thenReturn(user);
+        when(auth.getPrincipal()).thenReturn(userDetails);
 
         String token = jwtTokenProvider.generateToken(auth);
         String username = jwtTokenProvider.getUsernameFromJWT(token);
@@ -98,5 +107,6 @@ public class JwtTokenProviderTest {
         assertFalse(jwtTokenProvider.validateToken(null));
         assertFalse(jwtTokenProvider.validateToken(""));
     }
+
 
 }

@@ -1,4 +1,4 @@
-package com.project.spring_project;
+package com.project.spring_project.service;
 
 import com.project.spring_project.entity.RefreshToken;
 import com.project.spring_project.entity.Role;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@Profile("dev")
 public class RefreshTokenServiceTest {
 
     private RefreshTokenRepository refreshTokenRepositoryMock;
