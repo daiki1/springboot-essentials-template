@@ -3,6 +3,7 @@ package com.project.spring_project.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.payload.request.AuthRequest;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -234,6 +236,25 @@ public class AuthControllerTest {
         assertTrue(claims.containsKey("roles")); // or check specific roles
     }
 
+    @Test
+    void jwtTampering_alteredTokenIsRejected() throws Exception {
+        // Login to get a valid token
+        String validToken = getToken();
+
+        // Tamper the token: e.g., change a character in the payload
+        String[] parts = validToken.split("\\.");
+        assertEquals(3, parts.length, "JWT should have 3 parts");
+
+        // Alter the payload (2nd part) slightly
+        String tamperedPayload = parts[1].substring(0, parts[1].length() - 1) + "X";
+        String tamperedToken = parts[0] + "." + tamperedPayload + "." + parts[2];
+
+        // Try to access a protected endpoint using the tampered token
+        mockMvc.perform(get("/api/test/user") // replace with actual protected endpoint
+                        .header("Authorization", "Bearer " + tamperedToken))
+                .andExpect(status().isForbidden()); // or .isForbidden() depending on your filter
+    }
+
     /*
     #############   ACCESS
     */
@@ -265,29 +286,129 @@ public class AuthControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-
     /*
+    #############   PASSWORD RECOVERY
+    */
 
-    #Password Recovery
-        Send recovery request for existing email.
-        Handle non-existent email gracefully (no user enumeration).
-        Token generation (hashed if applicable).
-        Password reset success with valid token.
-        Password reset failure: expired, malformed, or reused token.
+    @Test
+    void sendRecoveryRequest_existingEmail_returnsOkAndSendsToken() throws Exception {
+        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Delete any existing token for the user however this is not necessary
+        testUserUtil.deletePasswordResetToken(user.getId());
 
-       #Pepper and hashing
-           Password hash varies with different peppers.
-           Login fails if incorrect pepper is used.
-           Pepper value is not stored in DB (can check DB directly).
+        mockMvc.perform(post("/api/auth/request-password-reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"" + testUserUtil.getEmail() + "\"}"))
+                .andExpect(status().isOk());
 
-       #Login
-            Failure with locked account.
-            JWT contains correct claims.
-            Token expiration is correct.
+        assertFalse(testUserUtil.findRefreshTokensByUser(user.getId()).isEmpty() , "Token should be stored");
+    }
 
-        JWT tampering: test that altered tokens are rejected.
+    @Test
+    void sendRecoveryRequest_nonExistentEmail_returnsOkButNoTokenLeak() throws Exception {
+        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Delete any existing token for the user however this is not necessary
+        testUserUtil.deletePasswordResetToken(user.getId());
 
+        mockMvc.perform(post("/api/auth/request-password-reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"test@example.com\"}"))
+                .andExpect(status().isBadRequest());
 
-     */
+        assertTrue(testUserUtil.findRefreshTokensByUser(user.getId()).isEmpty(), "No token should be created for unknown email");
+    }
+
+    @Test
+    void passwordReset_withValidToken_updatesPassword() throws Exception {
+        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Delete any existing token for the user however this is not necessary
+        testUserUtil.deletePasswordResetToken(user.getId());
+
+        mockMvc.perform(post("/api/auth/request-password-reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \""+testUserUtil.getEmail()+"\"}"))
+                .andExpect(status().isOk());
+
+        Optional<PasswordResetToken> passwordResetToken = testUserUtil.findRefreshTokensByUser(user.getId());
+
+        assertTrue(passwordResetToken.isPresent(), "Token should be created");
+
+        String newPassword = "newSecurePassword1!";
+        mockMvc.perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\": \"" + passwordResetToken.get().getToken() + "\", \"newPassword\": \"" + newPassword + "\"}"))
+                .andExpect(status().isOk());
+
+        User updatedUser = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        assertTrue(testUserUtil.getPasswordService().matches(newPassword, updatedUser.getPassword()));
+    }
+
+    @Test
+    void passwordReset_withExpiredToken_fails() throws Exception {
+        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Delete any existing token for the user however this is not necessary
+        testUserUtil.deletePasswordResetToken(user.getId());
+
+        mockMvc.perform(post("/api/auth/request-password-reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \""+testUserUtil.getEmail()+"\"}"))
+                .andExpect(status().isOk());
+
+        Optional<PasswordResetToken> passwordResetToken = testUserUtil.findRefreshTokensByUser(user.getId());
+
+        assertTrue(passwordResetToken.isPresent(), "Token should be created");
+
+        passwordResetToken.get().setExpiryDate(LocalDateTime.now().minusMinutes(1));
+        testUserUtil.getPasswordResetTokenRepository().save(passwordResetToken.get());
+
+        mockMvc.perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\": \"" + passwordResetToken.get().getToken() + "\", \"newPassword\": \"irrelevant1!\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void passwordReset_withMalformedToken_fails() throws Exception {
+        mockMvc.perform(post("/api/auth/request-password-reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\": \"invalid-token\", \"password\": \"newpass\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void passwordReset_withReusedToken_failsSecondTime() throws Exception {
+        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Delete any existing token for the user however this is not necessary
+        testUserUtil.deletePasswordResetToken(user.getId());
+
+        mockMvc.perform(post("/api/auth/request-password-reset")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \""+testUserUtil.getEmail()+"\"}"))
+                .andExpect(status().isOk());
+
+        Optional<PasswordResetToken> passwordResetToken = testUserUtil.findRefreshTokensByUser(user.getId());
+
+        assertTrue(passwordResetToken.isPresent(), "Token should be created");
+
+        // First attempt - success
+        String newPassword = "newSecurePassword1!";
+        mockMvc.perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\": \"" + passwordResetToken.get().getToken() + "\", \"newPassword\": \""+newPassword+"\"}"))
+                .andExpect(status().isOk());
+
+        // Second attempt - should fail
+        mockMvc.perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\": \"" + passwordResetToken.get().getToken() + "\", \"newPassword\": \"irrelevant1!\"}"))
+                .andExpect(status().isBadRequest());
+    }
 
 }

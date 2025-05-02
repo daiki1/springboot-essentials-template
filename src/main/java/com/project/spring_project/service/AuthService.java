@@ -170,6 +170,7 @@ public class AuthService {
     public void deleteTestUser(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user != null) {
+            passwordResetTokenRepository.deleteByUserId(user.getId());
             refreshTokenRepository.deleteByUser(user);
             userRepository.delete(user);
         }

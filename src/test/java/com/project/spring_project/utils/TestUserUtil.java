@@ -1,7 +1,9 @@
 package com.project.spring_project.utils;
 
+import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.payload.request.RegisterRequest;
+import com.project.spring_project.repository.PasswordResetTokenRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.services.PasswordService;
 import com.project.spring_project.service.AuthService;
@@ -24,6 +26,7 @@ public class TestUserUtil {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordService passwordService;
 
     public void registerUserIfNotExists() {
@@ -53,4 +56,11 @@ public class TestUserUtil {
         return userRepository.findByUsername(username);
     }
 
+    public void deletePasswordResetToken(Long userId) {
+        passwordResetTokenRepository.deleteByUserId(userId);
+    }
+
+    public Optional<PasswordResetToken> findRefreshTokensByUser(Long userId) {
+        return passwordResetTokenRepository.findByUserId(userId);
+    }
 }
