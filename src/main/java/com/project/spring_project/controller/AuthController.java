@@ -7,6 +7,7 @@ import com.project.spring_project.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,6 +27,13 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/change_roles")
+    public ResponseEntity<String> changeRoles(@RequestBody @Valid ChangeRolesRequest request) {
+        authService.changeUserRole(request.getUsername(), request.getRoles());
+        return ResponseEntity.ok("User roles change successfully");
     }
 
     @PostMapping("/request-password-reset")

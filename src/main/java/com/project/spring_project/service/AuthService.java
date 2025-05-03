@@ -25,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +40,9 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final EmailService emailService;
+    private final AuditLogService auditLogService;
 
+    @Transactional
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -55,6 +55,7 @@ public class AuthService {
                 user.setLockTime(null);
                 userRepository.save(user);
             } else {
+                auditLogService.logAudit(user.getUsername(), "ACCOUNT LOCKED", "Account is locked.");
                 throw new LockedException("Account is locked. Please try again later.");
             }
         }
@@ -81,6 +82,7 @@ public class AuthService {
 
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
+            auditLogService.logAudit(user.getUsername(), "LOGIN", "User successfully logged in.");
             return new AuthResponse(token, refreshToken.getRawToken());
         } catch (BadCredentialsException ex) {
             int newFailAttempts = user.getFailedAttempts() + 1;
@@ -117,6 +119,25 @@ public class AuthService {
         user.setRoles(Set.of(role));
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void changeUserRole(String username, List<String> newRoles) {
+        // Get user and change role logic here
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Set<Role> roles = new HashSet<>();
+        for (String newRole: newRoles){
+            Role role = roleRepository.findByName(newRole)
+                    .orElseThrow(() -> new IllegalStateException("Role "+newRole+" not found"));
+            roles.add(role);
+        }
+        Set<Role> oldRoles = user.getRoles();
+        user.setRoles(roles);
+        userRepository.save(user);
+
+        // Log the role change
+        auditLogService.logAudit(username, "ROLE_CHANGE", "Role changed from " + oldRoles.toString() + " to " + roles.toString());
     }
 
     public void requestPasswordReset(String email) {
@@ -174,5 +195,7 @@ public class AuthService {
             refreshTokenRepository.deleteByUser(user);
             userRepository.delete(user);
         }
+        auditLogService.logAudit(username, "USER_DELETION", "User deleted: " + username);
+
     }
 }

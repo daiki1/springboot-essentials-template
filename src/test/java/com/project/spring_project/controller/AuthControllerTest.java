@@ -1,8 +1,8 @@
 package com.project.spring_project.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.spring_project.BaseTest;
 import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Profile("dev")
-public class AuthControllerTest {
+public class AuthControllerTest extends BaseTest {
 
     @Value("${app.jwtSecret}")
     private String jwtSecret;
@@ -254,6 +255,32 @@ public class AuthControllerTest {
                         .header("Authorization", "Bearer " + tamperedToken))
                 .andExpect(status().isForbidden()); // or .isForbidden() depending on your filter
     }
+
+    /*
+    #############   CHANGE ROLES
+    */
+
+    /*@Test
+    void changingUserRoles() throws Exception {
+        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Role newRole = testUserUtil.getRoleRepository().findByName("ADMIN")
+                .orElseThrow(() -> new RuntimeException("ROLE not found"));
+
+        user.setRoles(Set.of(newRole));
+        testUserUtil.getUserRepository().save(user);
+
+        String request = "{\"username\": \""+testUserUtil.getTestUsername()+"\", \"roles\": [\"AUDIT\"] }";
+
+        // Change roles
+        mockMvc.perform(post("/api/auth/change_roles")
+                        .header("Authorization", "Bearer " + getToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk());
+
+    }*/
 
     /*
     #############   ACCESS

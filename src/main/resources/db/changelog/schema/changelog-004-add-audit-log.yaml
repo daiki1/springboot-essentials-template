@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-audit-log-table
+      author: Omar
+      changes:
+        - createTable:
+            tableName: audit_log
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  name: operation
+                  type: VARCHAR(100)
+              - column:
+                  name: timestamp
+                  type: DATETIME
+              - column:
+                  name: details
+                  type: TEXT

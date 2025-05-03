@@ -1,5 +1,6 @@
 package com.project.spring_project.config;
 
+import com.project.spring_project.secutrity.filter.RateLimitingFilter;
 import com.project.spring_project.secutrity.jwt.JwtAuthenticationEntryPoint;
 import com.project.spring_project.secutrity.jwt.JwtAuthenticationFilter;
 import com.project.spring_project.secutrity.services.PasswordService;
@@ -37,6 +38,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+    @Autowired
+    private RateLimitingFilter rateLimitingFilter;
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -45,6 +49,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigSource) throws Exception {
         http
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors(cors -> cors.configurationSource(corsConfigSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception
