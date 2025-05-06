@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-login-security-fields
+      author: Omar
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: language
+                  type: VARCHAR(3)

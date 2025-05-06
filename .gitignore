@@ -32,3 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 src/main/resources/mail-secrets.properties
+
+# Ignore all log files
+*.log
+
+# Ignore all files inside the logs/ directory
+logs/

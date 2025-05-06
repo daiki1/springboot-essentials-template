@@ -11,7 +11,7 @@ public class RegisterRequest {
     @NotBlank
     private String username;
 
-    @ValidPassword(message = "Password must be 8-50 characters long, contain uppercase, lowercase, number and special character")
+    @ValidPassword(message = "{password.invalid}")
     private String password;
 
     @Email

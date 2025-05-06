@@ -39,13 +39,15 @@ public class RefreshTokenServiceTest {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TestUserUtil testUserUtil;
+    private final LocalizationService localizationService;
 
     @Autowired
-    public RefreshTokenServiceTest(UserRepository userRepository, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository, TestUserUtil testUserUtil) {
+    public RefreshTokenServiceTest(UserRepository userRepository, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository, TestUserUtil testUserUtil, LocalizationService localizationService) {
         this.userRepository = userRepository;
         this.refreshTokenService = refreshTokenService;
         this.refreshTokenRepository = refreshTokenRepository;
         this.testUserUtil = testUserUtil;
+        this.localizationService = localizationService;
     }
 
     @BeforeEach
@@ -53,7 +55,7 @@ public class RefreshTokenServiceTest {
         refreshTokenRepositoryMock = mock(RefreshTokenRepository.class);
         JwtTokenProvider jwtService = mock(JwtTokenProvider.class);
         UserRepository userRepositoryMock = mock(UserRepository.class);
-        refreshTokenServiceMock = new RefreshTokenService(refreshTokenRepositoryMock, jwtService, userRepositoryMock);
+        refreshTokenServiceMock = new RefreshTokenService(refreshTokenRepositoryMock, jwtService, userRepositoryMock, localizationService);
     }
 
     private RefreshToken createAndSaveToken(User user, boolean isUsed, Instant expiry) {

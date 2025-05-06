@@ -50,6 +50,20 @@ public class User {
     @Column(name = "active_token")
     private String activeToken;
 
+    @Builder.Default
+    @Column(name = "failed_attempts")
+    private int failedAttempts = 0;
+
+    @Builder.Default
+    @Column(name = "account_locked")
+    private boolean accountLocked = false;
+
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
+
+    @Column(name = "language", length = 3)
+    private String language;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -61,15 +75,4 @@ public class User {
 
     @Column(name = "updated_by")
     private String updatedBy;
-
-    @Builder.Default
-    @Column(name = "failed_attempts")
-    private int failedAttempts = 0;
-
-    @Builder.Default
-    @Column(name = "account_locked")
-    private boolean accountLocked = false;
-
-    @Column(name = "lock_time")
-    private LocalDateTime lockTime;
 }

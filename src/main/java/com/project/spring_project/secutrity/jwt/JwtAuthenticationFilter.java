@@ -3,10 +3,12 @@ package com.project.spring_project.secutrity.jwt;
 import com.project.spring_project.exception.JwtAuthenticationException;
 import com.project.spring_project.secutrity.services.CustomUserDetails;
 import com.project.spring_project.secutrity.services.UserDetailsServiceImpl;
+import com.project.spring_project.service.LocalizationService;
 import com.project.spring_project.util.TokenUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,24 +21,17 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilter {
     @Value("${app.oneSingleSignOn}")
     private boolean oneSingleSignOn;
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final LocalizationService localizationService;
 
 
-    public JwtAuthenticationFilter(UserDetailsServiceImpl userDetailsService,
-                                   JwtAuthenticationEntryPoint authenticationEntryPoint) {
-        this.userDetailsService = userDetailsService;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -52,7 +47,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
                 SecurityContextHolder.clearContext();
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
                 HttpServletResponse httpResponse = (HttpServletResponse) response;
-                authenticationEntryPoint.commence(httpRequest, httpResponse, new JwtAuthenticationException("Invalid or expired session"));
+                authenticationEntryPoint.commence(httpRequest, httpResponse, new JwtAuthenticationException(localizationService.get("exception.invalid.expired.session")));
                 return; // STOP filter chain
             }
 

@@ -12,3 +12,5 @@ databaseChangeLog:
       file: db/changelog/schema/changelog-003-add-login-security.yaml
   - include:
       file: db/changelog/schema/changelog-004-add-audit-log.yaml
+  - include:
+      file: db/changelog/schema/changelog-005-user-language.yaml

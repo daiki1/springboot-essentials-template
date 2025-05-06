@@ -1,6 +1,8 @@
 package com.project.spring_project.exception;
 
 import com.project.spring_project.SpringProjectApplication;
+import com.project.spring_project.service.LocalizationService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,9 +27,12 @@ import java.util.Map;
 import static com.project.spring_project.util.ErrorResponseUtil.buildErrorResponse;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
     @Value("${spring.profiles.active:}")
     private String activeProfile;
+
+    private final LocalizationService localizationService;
 
     private static final Logger logger = LoggerFactory.getLogger(SpringProjectApplication.class);
 
@@ -76,7 +82,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleInvalidRequestBody(HttpMessageNotReadableException ex) {
         logError("HttpMessageNotReadableException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.BAD_REQUEST,"Malformed JSON request.")
+                buildErrorResponse(HttpStatus.BAD_REQUEST,localizationService.get("exception.malformed.json"))
                 , HttpStatus.BAD_REQUEST);
     }
 
@@ -85,7 +91,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex) {
         logError("UsernameNotFoundException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password."),
+                buildErrorResponse(HttpStatus.UNAUTHORIZED, localizationService.get("exception.invalid.credentials")),
                 HttpStatus.UNAUTHORIZED
         );
     }
@@ -95,7 +101,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
         logError("BadCredentialsException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password."),
+                buildErrorResponse(HttpStatus.UNAUTHORIZED, localizationService.get("exception.invalid.credentials")),
                 HttpStatus.UNAUTHORIZED
         );
     }
@@ -105,7 +111,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
         logError("AuthenticationException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid authentication credentials.")
+                buildErrorResponse(HttpStatus.UNAUTHORIZED, localizationService.get("exception.invalid.auth.credentials"))
                 , HttpStatus.UNAUTHORIZED);
     }
 
@@ -113,7 +119,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
         logError("AccessDeniedException", ex.getMessage());
-        Map<String, Object> body = buildErrorResponse(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
+        Map<String, Object> body = buildErrorResponse(HttpStatus.FORBIDDEN, localizationService.get("exception.access.permission.denied"));
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
 
@@ -122,8 +128,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleNotFound(NoHandlerFoundException ex) {
         logError("NoHandlerFoundException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.NOT_FOUND, "The requested endpoint was not found. "+ex.getRequestURL()),
+                buildErrorResponse(HttpStatus.NOT_FOUND, localizationService.get("exception.endoint.not.found",ex.getRequestURL())),
                 HttpStatus.NOT_FOUND);
+    }
+
+    // Handle error 405 method not allowed
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        logError("HttpRequestMethodNotSupportedException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.METHOD_NOT_ALLOWED, localizationService.get("exception.method.not.allowed")),
+                HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     // Handle error 423 locked
@@ -131,7 +146,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleLockedException(LockedException ex) {
         logError("LockedException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.LOCKED, "Your account is locked. Try again later."),
+                buildErrorResponse(HttpStatus.LOCKED, localizationService.get("exception.user.accounbt.locked")),
                 HttpStatus.LOCKED // HTTP 423 Locked
         );
     }
@@ -141,7 +156,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleAll(Exception ex) {
         logError("Exception", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong.")
+                buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,localizationService.get("exception.general"))
                 , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

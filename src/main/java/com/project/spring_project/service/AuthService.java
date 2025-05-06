@@ -20,6 +20,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,11 +42,12 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final EmailService emailService;
     private final AuditLogService auditLogService;
+    private final LocalizationService localizationService;
 
     @Transactional
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(localizationService.get("user.not.found")));
 
         if (user.isAccountLocked()) {
             if (user.getLockTime() != null && user.getLockTime().isBefore(LocalDateTime.now().minusMinutes(15))) {
@@ -56,7 +58,7 @@ public class AuthService {
                 userRepository.save(user);
             } else {
                 auditLogService.logAudit(user.getUsername(), "ACCOUNT LOCKED", "Account is locked.");
-                throw new LockedException("Account is locked. Please try again later.");
+                throw new LockedException(localizationService.get("exception.user.accounbt.locked"));
             }
         }
 
@@ -101,15 +103,15 @@ public class AuthService {
 
     public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already taken");
+            throw new IllegalArgumentException(localizationService.get("user.name.already.taken"));
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already registered");
+            throw new IllegalArgumentException(localizationService.get("user.email.already.registered"));
         }
 
         Role role = roleRepository.findByName("USER")
-                .orElseThrow(() -> new IllegalStateException("Default role USER not found"));
+                .orElseThrow(() -> new IllegalStateException(localizationService.get("user.role.not.found", "USER")));
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -124,12 +126,12 @@ public class AuthService {
     @Transactional
     public void changeUserRole(String username, List<String> newRoles) {
         // Get user and change role logic here
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException(localizationService.get("user.not.found")));
 
         Set<Role> roles = new HashSet<>();
         for (String newRole: newRoles){
             Role role = roleRepository.findByName(newRole)
-                    .orElseThrow(() -> new IllegalStateException("Role "+newRole+" not found"));
+                    .orElseThrow(() -> new IllegalStateException(localizationService.get("user.role.not.found", newRole)));
             roles.add(role);
         }
         Set<Role> oldRoles = user.getRoles();
@@ -142,7 +144,7 @@ public class AuthService {
 
     public void requestPasswordReset(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.not.found")));
 
         Optional<PasswordResetToken> existing = passwordResetTokenRepository.findByUserId(user.getId());
         existing.ifPresent(passwordResetTokenRepository::delete);
@@ -161,8 +163,8 @@ public class AuthService {
         System.out.println("Password reset link: https://your-app.com/reset-password?token=" + token);
         emailService.sendPlainTextEmail(
                 user.getEmail(),
-                "Password Reset Request",
-                "Click the link to reset your password: https://your-app.com/reset-password?token=" + token
+                localizationService.get("user.password.request"),
+                localizationService.get("user.password.link.message","https://your-app.com/reset-password?token=" + token)
         );
     }
 
@@ -171,11 +173,11 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Token expired");
+            throw new IllegalArgumentException(localizationService.get("token.expired"));
         }
 
         if (resetToken.isUsed()) {
-            throw new IllegalArgumentException("Token already used");
+            throw new IllegalArgumentException(localizationService.get("token.already.used"));
         }
 
         User user = resetToken.getUser();
@@ -196,6 +198,17 @@ public class AuthService {
             userRepository.delete(user);
         }
         auditLogService.logAudit(username, "USER_DELETION", "User deleted: " + username);
+
+    }
+
+    public void changeLanguage(String language) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException(localizationService.get("user.not.found")));
+        user.setLanguage(language);
+        userRepository.save(user);
 
     }
 }

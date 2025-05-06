@@ -8,6 +8,7 @@ import com.project.spring_project.repository.RefreshTokenRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
 import com.project.spring_project.util.TokenUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +26,15 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtService;
     private final UserRepository userRepository;
+    private final LocalizationService localizationService;
 
-
-    public RefreshTokenService(RefreshTokenRepository tokenRepository, JwtTokenProvider jwtService, UserRepository userRepository) {
-        this.refreshTokenRepository = tokenRepository;
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, JwtTokenProvider jwtService, UserRepository userRepository, LocalizationService localizationService) {
+        this.refreshTokenRepository = refreshTokenRepository;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.localizationService = localizationService;
     }
+
 
     public RefreshToken createRefreshToken(User user) {
         String rawToken = UUID.randomUUID().toString();
@@ -51,17 +54,17 @@ public class RefreshTokenService {
     public AuthResponse refreshAccessToken(RefreshTokenRequest request) {
         String hashedToken = hashedToken(request.getRefreshToken());
         RefreshToken token = refreshTokenRepository.findByTokenHash(hashedToken)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new RuntimeException(localizationService.get("token.refresh.invalid")));
 
         if (token.isUsed() || token.getExpiryDate().isBefore(Instant.now())) {
-            throw new RuntimeException("Refresh token expired or already used");
+            throw new RuntimeException(localizationService.get("token.refresh.used"));
         }
 
         token.setUsed(true);
         refreshTokenRepository.save(token);
 
         User user = userRepository.findById(token.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException(localizationService.get("user.not.found")));
 
         String jwt = jwtService.generateToken(user);
         String encodedToken = TokenUtils.hashedToken(jwt);
