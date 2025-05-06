@@ -38,3 +38,4 @@ src/main/resources/mail-secrets.properties
 
 # Ignore all files inside the logs/ directory
 logs/
+/logs
