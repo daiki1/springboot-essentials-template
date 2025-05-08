@@ -4,6 +4,8 @@ import com.project.spring_project.entity.User;
 import com.project.spring_project.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,8 +19,17 @@ public class UserLocaleResolver extends AcceptHeaderLocaleResolver {
     @Autowired
     private UserRepository userRepository;
 
+    @Value("${app.locale.default:en}")
+    String defaultLang;
+
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
+        System.out.println("resolveLocale");
+        /*String headerLang = request.getHeader("Accept-Language");
+        if (headerLang == null || headerLang.isBlank()) {
+            return Locale.forLanguageTag(defaultLang);
+        }*/
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             String username = auth.getName();
@@ -28,6 +39,6 @@ public class UserLocaleResolver extends AcceptHeaderLocaleResolver {
                 return Locale.forLanguageTag(lang);
             }
         }
-        return Locale.ENGLISH;
+        return Locale.forLanguageTag(defaultLang);
     }
 }

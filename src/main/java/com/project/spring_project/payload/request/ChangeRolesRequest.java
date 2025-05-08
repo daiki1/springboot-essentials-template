@@ -10,9 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ChangeRolesRequest {
-    @NotBlank
-    private String username;
-
     @NotEmpty
     private List<String> roles;
 }

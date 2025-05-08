@@ -86,6 +86,14 @@ public class GlobalExceptionHandler {
                 , HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailSendException(EmailSendException ex) {
+        logError("HttpMessageNotReadableException", ex.getMessage());
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.BAD_REQUEST,localizationService.get("exception.email.send.failed"))
+                , HttpStatus.BAD_REQUEST);
+    }
+
     // Handle error 401 unauthorized
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex) {

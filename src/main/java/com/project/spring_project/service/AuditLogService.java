@@ -14,9 +14,9 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
-    public void logAudit(String username, String operation, String details) {
+    public void logAudit(Long userId, String operation, String details) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setUsername(username);
+        auditLog.setUserId(userId);
         auditLog.setOperation(operation);
         auditLog.setTimestamp(LocalDateTime.now());
         auditLog.setDetails(details);

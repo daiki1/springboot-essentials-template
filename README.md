@@ -15,6 +15,7 @@ Production-ready Spring Boot REST API project to kickstart any backend applicati
 - Maven-based project structure
 - MySQL Database Integration
 - JWT Authentication & Role-Based Access Control
+- Configurable one session per user or multiple sessions 
 - Single session login or multiple sessions configurable in `application.properties` 
 - DTO Mapping with MapStruct
 - RESTful API with CRUD examples

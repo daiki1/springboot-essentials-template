@@ -14,8 +14,8 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: username
-                  type: VARCHAR(255)
+                  name: user_id
+                  type: BIGINT
               - column:
                   name: operation
                   type: VARCHAR(100)

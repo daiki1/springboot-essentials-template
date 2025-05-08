@@ -4,6 +4,7 @@ import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.RefreshToken;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
+import com.project.spring_project.exception.EmailSendException;
 import com.project.spring_project.payload.request.AuthRequest;
 import com.project.spring_project.payload.request.RegisterRequest;
 import com.project.spring_project.payload.response.AuthResponse;
@@ -14,13 +15,14 @@ import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.services.PasswordService;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
 import com.project.spring_project.util.TokenUtils;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +59,7 @@ public class AuthService {
                 user.setLockTime(null);
                 userRepository.save(user);
             } else {
-                auditLogService.logAudit(user.getUsername(), "ACCOUNT LOCKED", "Account is locked.");
+                auditLogService.logAudit(user.getId(), "ACCOUNT LOCKED", "Account is locked.");
                 throw new LockedException(localizationService.get("exception.user.accounbt.locked"));
             }
         }
@@ -84,7 +86,7 @@ public class AuthService {
 
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-            auditLogService.logAudit(user.getUsername(), "LOGIN", "User successfully logged in.");
+            auditLogService.logAudit(user.getId(), "LOGIN", "User successfully logged in.");
             return new AuthResponse(token, refreshToken.getRawToken());
         } catch (BadCredentialsException ex) {
             int newFailAttempts = user.getFailedAttempts() + 1;
@@ -123,25 +125,6 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    @Transactional
-    public void changeUserRole(String username, List<String> newRoles) {
-        // Get user and change role logic here
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException(localizationService.get("user.not.found")));
-
-        Set<Role> roles = new HashSet<>();
-        for (String newRole: newRoles){
-            Role role = roleRepository.findByName(newRole)
-                    .orElseThrow(() -> new IllegalStateException(localizationService.get("user.role.not.found", newRole)));
-            roles.add(role);
-        }
-        Set<Role> oldRoles = user.getRoles();
-        user.setRoles(roles);
-        userRepository.save(user);
-
-        // Log the role change
-        auditLogService.logAudit(username, "ROLE_CHANGE", "Role changed from " + oldRoles.toString() + " to " + roles.toString());
-    }
-
     public void requestPasswordReset(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.not.found")));
@@ -161,11 +144,15 @@ public class AuthService {
 
         // For now: log it. In prod, send email.
         System.out.println("Password reset link: https://your-app.com/reset-password?token=" + token);
-        emailService.sendPlainTextEmail(
-                user.getEmail(),
-                localizationService.get("user.password.request"),
-                localizationService.get("user.password.link.message","https://your-app.com/reset-password?token=" + token)
-        );
+        try {
+            emailService.sendPlainTextEmail(
+                    user.getEmail(),
+                    localizationService.get("user.password.request"),
+                    localizationService.get("user.password.link.message", "https://your-app.com/reset-password?token=" + token)
+            );
+        } catch (MailException e) {
+            throw new EmailSendException("exception.email.send.failed", e);
+        }
     }
 
     public void resetPassword(String token, String newPassword) {
@@ -192,23 +179,15 @@ public class AuthService {
     @Transactional
     public void deleteTestUser(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
+        Long userId = user != null ? user.getId() : null;
         if (user != null) {
             passwordResetTokenRepository.deleteByUserId(user.getId());
             refreshTokenRepository.deleteByUser(user);
             userRepository.delete(user);
         }
-        auditLogService.logAudit(username, "USER_DELETION", "User deleted: " + username);
+        auditLogService.logAudit(userId, "USER_DELETION", "User deleted: " + username);
 
     }
 
-    public void changeLanguage(String language) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException(localizationService.get("user.not.found")));
-        user.setLanguage(language);
-        userRepository.save(user);
-
-    }
 }

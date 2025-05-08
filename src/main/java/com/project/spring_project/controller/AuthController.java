@@ -8,10 +8,7 @@ import com.project.spring_project.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,13 +30,6 @@ public class AuthController {
         return ResponseEntity.ok(localizationService.get("user.registered"));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/change_roles")
-    public ResponseEntity<String> changeRoles(@RequestBody @Valid ChangeRolesRequest request) {
-        authService.changeUserRole(request.getUsername(), request.getRoles());
-        return ResponseEntity.ok(localizationService.get("user.role.changed"));
-    }
-
     @PostMapping("/request-password-reset")
     public ResponseEntity<?> requestReset(@RequestBody EmailRequest request) {
         authService.requestPasswordReset(request.getEmail());
@@ -58,11 +48,4 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/language")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> changeLanguage(@RequestBody Map<String, String> request) {
-        String language = request.get("language");
-        authService.changeLanguage(language);
-        return ResponseEntity.ok(localizationService.get("user.language.updated"));
-    }
 }

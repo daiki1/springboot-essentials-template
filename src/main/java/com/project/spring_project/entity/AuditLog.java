@@ -17,8 +17,8 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "operation")
     private String operation; // e.g., "LOGIN", "ROLE_CHANGE", "USER_DELETION"
