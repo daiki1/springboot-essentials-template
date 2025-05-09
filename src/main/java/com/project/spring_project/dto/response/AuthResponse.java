@@ -1,4 +1,4 @@
-package com.project.spring_project.payload.response;
+package com.project.spring_project.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

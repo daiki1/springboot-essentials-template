@@ -1,4 +1,4 @@
-package com.project.spring_project.service;
+package com.project.spring_project.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

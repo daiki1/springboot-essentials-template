@@ -1,4 +1,4 @@
-package com.project.spring_project.payload.request;
+package com.project.spring_project.dto.request;
 
 import com.project.spring_project.validation.ValidPassword;
 import jakarta.validation.constraints.Email;

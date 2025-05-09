@@ -2,7 +2,7 @@ package com.project.spring_project.utils;
 
 import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.User;
-import com.project.spring_project.payload.request.RegisterRequest;
+import com.project.spring_project.dto.request.RegisterRequest;
 import com.project.spring_project.repository.PasswordResetTokenRepository;
 import com.project.spring_project.repository.RoleRepository;
 import com.project.spring_project.repository.UserRepository;

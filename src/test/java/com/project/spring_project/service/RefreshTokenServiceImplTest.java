@@ -1,13 +1,13 @@
 package com.project.spring_project.service;
 
 import com.project.spring_project.entity.RefreshToken;
-import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
-import com.project.spring_project.payload.request.RefreshTokenRequest;
+import com.project.spring_project.dto.request.RefreshTokenRequest;
 import com.project.spring_project.repository.RefreshTokenRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
-import com.project.spring_project.service.RefreshTokenService;
+import com.project.spring_project.service.impl.RefreshTokenServiceImpl;
+import com.project.spring_project.util.LocalizationService;
 import com.project.spring_project.util.TokenUtils;
 import com.project.spring_project.utils.TestUserUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,14 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,20 +28,20 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Profile("dev")
-public class RefreshTokenServiceTest {
+public class RefreshTokenServiceImplTest {
 
     private RefreshTokenRepository refreshTokenRepositoryMock;
-    private RefreshTokenService refreshTokenServiceMock;
+    private RefreshTokenServiceImpl refreshTokenServiceImplMock;
     private final UserRepository userRepository;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TestUserUtil testUserUtil;
     private final LocalizationService localizationService;
 
     @Autowired
-    public RefreshTokenServiceTest(UserRepository userRepository, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository, TestUserUtil testUserUtil, LocalizationService localizationService) {
+    public RefreshTokenServiceImplTest(UserRepository userRepository, RefreshTokenServiceImpl refreshTokenServiceImpl, RefreshTokenRepository refreshTokenRepository, TestUserUtil testUserUtil, LocalizationService localizationService) {
         this.userRepository = userRepository;
-        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenServiceImpl = refreshTokenServiceImpl;
         this.refreshTokenRepository = refreshTokenRepository;
         this.testUserUtil = testUserUtil;
         this.localizationService = localizationService;
@@ -55,7 +52,7 @@ public class RefreshTokenServiceTest {
         refreshTokenRepositoryMock = mock(RefreshTokenRepository.class);
         JwtTokenProvider jwtService = mock(JwtTokenProvider.class);
         UserRepository userRepositoryMock = mock(UserRepository.class);
-        refreshTokenServiceMock = new RefreshTokenService(refreshTokenRepositoryMock, jwtService, userRepositoryMock, localizationService);
+        refreshTokenServiceImplMock = new RefreshTokenServiceImpl(refreshTokenRepositoryMock, jwtService, userRepositoryMock, localizationService);
     }
 
     private RefreshToken createAndSaveToken(User user, boolean isUsed, Instant expiry) {
@@ -88,7 +85,7 @@ public class RefreshTokenServiceTest {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken(rawToken);
 
-        assertThrows(RuntimeException.class, () -> refreshTokenServiceMock.refreshAccessToken(request));
+        assertThrows(RuntimeException.class, () -> refreshTokenServiceImplMock.refreshAccessToken(request));
     }
 
     @Test
@@ -104,7 +101,7 @@ public class RefreshTokenServiceTest {
         request.setRefreshToken(usedToken.getRawToken());
 
         // When / Then
-        assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+        assertThrows(RuntimeException.class, () -> refreshTokenServiceImpl.refreshAccessToken(request));
 
         testUserUtil.deleteTestUser();
     }
@@ -114,7 +111,7 @@ public class RefreshTokenServiceTest {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("non-existent-token");
 
-        assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+        assertThrows(RuntimeException.class, () -> refreshTokenServiceImpl.refreshAccessToken(request));
     }
 
     @Test
@@ -122,7 +119,7 @@ public class RefreshTokenServiceTest {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("");
 
-        assertThrows(RuntimeException.class, () -> refreshTokenService.refreshAccessToken(request));
+        assertThrows(RuntimeException.class, () -> refreshTokenServiceImpl.refreshAccessToken(request));
     }
 
     @Test
@@ -138,7 +135,7 @@ public class RefreshTokenServiceTest {
         createAndSaveToken(user, false, Instant.now().plus(15, ChronoUnit.MINUTES)); // valid
 
         // When
-        refreshTokenService.cleanOldRefreshTokens();
+        refreshTokenServiceImpl.cleanOldRefreshTokens();
 
         // Then
         List<RefreshToken> tokens = refreshTokenRepository.findAllByUser(user);

@@ -1,8 +1,7 @@
 package com.project.spring_project.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.spring_project.dto.UserDto;
-import com.project.spring_project.payload.request.UserUpdateRequest;
+import com.project.spring_project.dto.request.UserUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

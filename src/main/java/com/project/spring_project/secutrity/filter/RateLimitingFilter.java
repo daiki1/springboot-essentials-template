@@ -1,7 +1,7 @@
 package com.project.spring_project.secutrity.filter;
 
 import com.project.spring_project.secutrity.services.RateLimitingService;
-import com.project.spring_project.service.LocalizationService;
+import com.project.spring_project.util.LocalizationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,9 +1,9 @@
 package com.project.spring_project.controller;
 
-import com.project.spring_project.payload.request.*;
-import com.project.spring_project.payload.response.AuthResponse;
+import com.project.spring_project.dto.request.*;
+import com.project.spring_project.dto.response.AuthResponse;
 import com.project.spring_project.service.AuthService;
-import com.project.spring_project.service.LocalizationService;
+import com.project.spring_project.util.LocalizationService;
 import com.project.spring_project.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

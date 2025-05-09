@@ -3,9 +3,8 @@ package com.project.spring_project.secutrity.services;
 
 import com.project.spring_project.entity.User;
 import com.project.spring_project.repository.UserRepository;
-import com.project.spring_project.service.LocalizationService;
+import com.project.spring_project.util.LocalizationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

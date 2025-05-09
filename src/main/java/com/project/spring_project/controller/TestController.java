@@ -1,6 +1,6 @@
 package com.project.spring_project.controller;
 
-import com.project.spring_project.service.LocalizationService;
+import com.project.spring_project.util.LocalizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

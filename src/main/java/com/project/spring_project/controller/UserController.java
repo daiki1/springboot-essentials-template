@@ -1,11 +1,10 @@
 package com.project.spring_project.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.spring_project.dto.UserDto;
-import com.project.spring_project.payload.request.ChangeRolesRequest;
-import com.project.spring_project.payload.request.UserStatusUpdateRequest;
-import com.project.spring_project.payload.request.UserUpdateRequest;
-import com.project.spring_project.service.LocalizationService;
+import com.project.spring_project.dto.request.ChangeRolesRequest;
+import com.project.spring_project.dto.request.UserStatusUpdateRequest;
+import com.project.spring_project.dto.request.UserUpdateRequest;
+import com.project.spring_project.util.LocalizationService;
 import com.project.spring_project.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

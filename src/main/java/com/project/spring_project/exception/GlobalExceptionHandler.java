@@ -1,7 +1,7 @@
 package com.project.spring_project.exception;
 
 import com.project.spring_project.SpringProjectApplication;
-import com.project.spring_project.service.LocalizationService;
+import com.project.spring_project.util.LocalizationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 

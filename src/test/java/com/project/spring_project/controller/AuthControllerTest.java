@@ -6,8 +6,8 @@ import com.project.spring_project.BaseTest;
 import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
-import com.project.spring_project.payload.request.AuthRequest;
-import com.project.spring_project.payload.request.RegisterRequest;
+import com.project.spring_project.dto.request.AuthRequest;
+import com.project.spring_project.dto.request.RegisterRequest;
 import com.project.spring_project.utils.TestUserUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -61,6 +61,7 @@ public class AuthControllerTest extends BaseTest {
 
     private String getToken() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .header("Accept-Language", "en")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(testUserUtil.getRequestBody()))
                 .andExpect(status().isOk())
@@ -295,9 +296,9 @@ public class AuthControllerTest extends BaseTest {
     @Test
     public void shouldAccessUserEndpoint() throws Exception {
         mockMvc.perform(get("/api/test/user")
-                        .header("Authorization", "Bearer " + getToken()))
-                .andExpect(status()
-                .isOk());
+                        .header("Authorization", "Bearer " + getToken())
+                        .header("Accept-Language", "en"))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -309,7 +310,8 @@ public class AuthControllerTest extends BaseTest {
     @Test
     public void shouldNotAccessAdminEndpoint() throws Exception {
         mockMvc.perform(get("/api/test/admin")
-                .header("Authorization", "Bearer " + getToken()))
+                        .header("Authorization", "Bearer " + getToken())
+                        .header("Accept-Language", "en"))
                 .andExpect(status().isForbidden());
     }
 
