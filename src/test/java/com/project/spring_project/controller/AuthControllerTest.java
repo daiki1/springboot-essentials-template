@@ -3,6 +3,7 @@ package com.project.spring_project.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.spring_project.BaseTest;
+import com.project.spring_project.dto.response.AuthResponse;
 import com.project.spring_project.entity.PasswordResetToken;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
@@ -29,7 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -60,20 +60,12 @@ public class AuthControllerTest extends BaseTest {
     }
 
     private String getToken() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/auth/login")
-                        .header("Accept-Language", "en")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(testUserUtil.getRequestBody()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
-                .andReturn();
+        AuthRequest request = new AuthRequest();
+        request.setUsername(testUserUtil.getTestUsername());
+        request.setPassword(testUserUtil.getRawPassword());
+        AuthResponse authResponse = testUserUtil.getAuthService().login(request);
 
-        // Parse the response JSON and extract the token
-        String responseContent = result.getResponse().getContentAsString();
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(responseContent);
-
-        return jsonNode.get("token").asText();
+        return authResponse.getToken();
     }
 
     /*
@@ -256,32 +248,6 @@ public class AuthControllerTest extends BaseTest {
                         .header("Authorization", "Bearer " + tamperedToken))
                 .andExpect(status().isForbidden()); // or .isForbidden() depending on your filter
     }
-
-    /*
-    #############   CHANGE ROLES
-    */
-
-    /*@Test
-    void changingUserRoles() throws Exception {
-        User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Role newRole = testUserUtil.getRoleRepository().findByName("ADMIN")
-                .orElseThrow(() -> new RuntimeException("ROLE not found"));
-
-        user.setRoles(Set.of(newRole));
-        testUserUtil.getUserRepository().save(user);
-
-        String request = "{\"username\": \""+testUserUtil.getTestUsername()+"\", \"roles\": [\"AUDIT\"] }";
-
-        // Change roles
-        mockMvc.perform(post("/api/auth/change_roles")
-                        .header("Authorization", "Bearer " + getToken())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
-                .andExpect(status().isOk());
-
-    }*/
 
     /*
     #############   ACCESS

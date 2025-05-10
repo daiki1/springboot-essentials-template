@@ -23,6 +23,7 @@ public class UserLocaleResolver extends AcceptHeaderLocaleResolver {
 
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
+        // Check if the user is authenticated and retrieve their language preference
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             String username = auth.getName();
@@ -33,11 +34,13 @@ public class UserLocaleResolver extends AcceptHeaderLocaleResolver {
             }
         }
 
+        // Fallback to the Accept-Language header if no user preference is found
         String headerLang = request.getHeader("Accept-Language");
         if (headerLang != null && !headerLang.isBlank()) {
             return Locale.forLanguageTag(headerLang);
         }
 
+        // Fallback to the default language if no user preference or Accept-Language header is found
         return Locale.forLanguageTag(defaultLang);
     }
 }

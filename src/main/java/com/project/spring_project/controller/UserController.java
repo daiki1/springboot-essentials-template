@@ -35,13 +35,13 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @GetMapping("/by_name/{username}")
+    @GetMapping("/username/{username}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')")
     public UserDto getUserByName(@PathVariable String username) {
         return userService.getUserByUsername(username);
     }
 
-    @GetMapping("/by_email/{email}")
+    @GetMapping("/email/{email}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')")
     public UserDto getUserByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email);

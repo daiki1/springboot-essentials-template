@@ -66,10 +66,14 @@ public class UserServiceImpl implements UserService {
 
         String oldUserJson = JsonUtils.objectToJson(user);
 
-        user.setEmail(request.getEmail());
-        user.setUsername(request.getUsername());
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+            user.setUsername(request.getUsername());
+        }
 
-        auditLogService.logAudit(user.getId(), "UPDATE_USER", "Update user from " + oldUserJson + " to " + JsonUtils.objectToJson(user));
+        auditLogService.logAudit(user.getId(), "UPDATE_USER", "Update user from " + oldUserJson + " to " + JsonUtils.objectToJsonNotNulls(request));
 
         return userMapper.toDto(userRepository.save(user));
     }
