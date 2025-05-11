@@ -3,8 +3,16 @@ package com.project.spring_project.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+import java.lang.annotation.Documented;
+
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
 
+    /**
+     * Initializes the validator. This method is called before the validation process starts.
+     *
+     * @param password The password to be validated.
+     * @param context The context in which the constraint is evaluated.
+     */
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
         if (password == null) return false;

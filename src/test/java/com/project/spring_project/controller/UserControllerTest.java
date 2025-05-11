@@ -4,6 +4,7 @@ import com.project.spring_project.dto.request.AuthRequest;
 import com.project.spring_project.dto.response.AuthResponse;
 import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
+import com.project.spring_project.exception.BadRequestException;
 import com.project.spring_project.service.AuthService;
 import com.project.spring_project.utils.TestUserUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -41,9 +42,9 @@ public class UserControllerTest {
         testUserUtil.registerUserIfNotExists();
         //Add admin role to be able to access the endpoints
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         Role role = testUserUtil.getRoleRepository().findByName("ADMIN")
-                        .orElseThrow(() -> new RuntimeException("Role not found"));
+                        .orElseThrow(() -> new BadRequestException("Role not found"));
         user.setRoles(Set.of(role));
         testUserUtil.getUserRepository().save(user);
 

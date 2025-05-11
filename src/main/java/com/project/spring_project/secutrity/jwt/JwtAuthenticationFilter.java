@@ -30,8 +30,16 @@ public class JwtAuthenticationFilter extends GenericFilter {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final LocalizationService localizationService;
 
-
-
+    /**
+     * This method is called for every request to check if the request contains a valid JWT token.
+     * If the token is valid, it sets the authentication in the security context.
+     *
+     * @param request  the servlet request
+     * @param response the servlet response
+     * @param chain    the filter chain
+     * @throws IOException      if an I/O error occurs
+     * @throws ServletException if a servlet error occurs
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -60,6 +68,12 @@ public class JwtAuthenticationFilter extends GenericFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * Extracts the JWT token from the request header.
+     *
+     * @param request the servlet request
+     * @return the JWT token or null if not found
+     */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {

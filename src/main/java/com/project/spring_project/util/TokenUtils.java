@@ -6,6 +6,12 @@ import java.security.NoSuchAlgorithmException;
 
 public class TokenUtils {
 
+    /**
+     * Hashes a given token using SHA-256 algorithm.
+     *
+     * @param token the token to be hashed
+     * @return the hashed token as a hexadecimal string
+     */
     public static String hashedToken(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

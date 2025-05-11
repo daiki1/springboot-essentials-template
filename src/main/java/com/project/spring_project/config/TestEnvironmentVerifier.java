@@ -14,8 +14,11 @@ public class TestEnvironmentVerifier {
         this.environment = environment;
     }
 
-    // This method will be called after the Spring context is initialized
-    // and will check the active profiles to ensure that tests are not run in production
+    /**
+     * Verifies that the application is not running in a production environment.
+     * <p>
+     * This method checks the active profiles and throws an exception if any of them indicate a production environment.
+     */
     @PostConstruct
     public void verifyEnvironment() {
         String[] activeProfiles = environment.getActiveProfiles();

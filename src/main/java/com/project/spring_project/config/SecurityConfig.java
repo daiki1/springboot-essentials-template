@@ -47,6 +47,16 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Configures the security filter chain for the application.
+     * <p>
+     * This method sets up CORS, CSRF, session management, and request authorization.
+     *
+     * @param http the HttpSecurity object to configure
+     * @param corsConfigSource the CorsConfigurationSource object for CORS settings
+     * @return a SecurityFilterChain object with the configured security settings
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigSource) throws Exception {
         http
@@ -80,14 +90,31 @@ public class SecurityConfig {
                         .requestMatchers("/api/auditor/**").hasRole("AUDITOR")
                         .requestMatchers("/api/user/**").hasRole("USER")
 
+                        .requestMatchers( //Doc endpoints
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
+
                         .anyRequest().authenticated()
                 );
 
         return http.build();
     }
 
+    /**
+     * Configures the authentication provider for the application.
+     * <p>
+     * This method sets up a DaoAuthenticationProvider with a custom UserDetailsService and PasswordService.
+     *
+     * @param passwordService the PasswordService for password encoding and matching
+     * @param userDetailsService the UserDetailsService for user authentication
+     * @return a DaoAuthenticationProvider object configured for authentication
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider(PasswordService passwordService, UserDetailsService userDetailsService) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -107,6 +134,13 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Configures the PasswordEncoder for the application.
+     * <p>
+     * This method sets up a BCryptPasswordEncoder for password hashing and matching.
+     *
+     * @return a PasswordEncoder object configured for password encoding
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

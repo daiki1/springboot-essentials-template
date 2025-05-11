@@ -21,11 +21,20 @@ public class SpringProjectApplication implements CommandLineRunner{
 
 	private static final Logger logger = LoggerFactory.getLogger(SpringProjectApplication.class);
 
+	/**
+	 * Main method to run the Spring Boot application.
+	 *
+	 * @param args command line arguments
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(SpringProjectApplication.class, args);
 
 	}
 
+	/**
+	 * Runs after the application context is loaded and ready to be used.
+	 * Displays system information and application properties.
+	 */
 	@Override
 	public void run(String... args) {
 		logger.info("==== App Started ====");

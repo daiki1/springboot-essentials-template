@@ -12,6 +12,13 @@ import java.util.Locale;
 @Configuration
 public class InternationalizationConfig {
 
+    /**
+     * Configures the message source for internationalization.
+     * <p>
+     * This method sets up a ResourceBundleMessageSource to load messages from the "messages" properties file.
+     *
+     * @return a MessageSource object configured for internationalization
+     */
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -21,11 +28,25 @@ public class InternationalizationConfig {
         return messageSource;
     }
 
+    /**
+     * Configures the LocaleResolver for the application.
+     * <p>
+     * This method sets up a UserLocaleResolver to resolve the user's locale based on their preferences.
+     *
+     * @return a LocaleResolver object configured for user locale resolution
+     */
     @Bean
     public LocaleResolver localeResolver() {
         return new UserLocaleResolver();
     }
 
+    /**
+     * Configures the LocalValidatorFactoryBean for validation.
+     * <p>
+     * This method sets up a LocalValidatorFactoryBean to use the message source for validation messages.
+     *
+     * @return a LocalValidatorFactoryBean object configured for validation
+     */
     @Bean
     public LocalValidatorFactoryBean getValidator() {
         LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();

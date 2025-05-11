@@ -8,7 +8,13 @@ import java.util.Map;
 
 public class ErrorResponseUtil {
 
-    // Method to build a standard error response
+    /**
+     * Builds a standard error response.
+     *
+     * @param status  the HTTP status
+     * @param message the error message
+     * @return a map containing the error response
+     */
     public static Map<String, Object> buildErrorResponse(HttpStatus status, String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());

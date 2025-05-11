@@ -16,6 +16,13 @@ public class JsonUtils  {
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+    /**
+     * Converts an object to its JSON string representation.
+     *
+     * @param o the object to convert
+     * @return the JSON string representation of the object
+     * @throws RuntimeException if the conversion fails
+     */
     public static String objectToJson(Object o) {
         try {
             return mapper.writeValueAsString(o);
@@ -24,6 +31,13 @@ public class JsonUtils  {
         }
     }
 
+    /**
+     * Converts an object to its JSON string representation, excluding null values.
+     *
+     * @param o the object to convert
+     * @return the JSON string representation of the object, excluding null values
+     * @throws RuntimeException if the conversion fails
+     */
     public static String objectToJsonNotNulls(Object o) {
         try {
             return mapperNotNulls.writeValueAsString(o);

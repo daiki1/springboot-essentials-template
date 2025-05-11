@@ -3,6 +3,7 @@ package com.project.spring_project.service;
 import com.project.spring_project.entity.RefreshToken;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.dto.request.RefreshTokenRequest;
+import com.project.spring_project.exception.BadRequestException;
 import com.project.spring_project.repository.RefreshTokenRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
@@ -93,7 +94,7 @@ public class RefreshTokenServiceImplTest {
         testUserUtil.registerUserIfNotExists();
         // Given: A token that's marked as used
         User user = userRepository.findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow( () -> new RuntimeException("User not found"));
+                .orElseThrow( () -> new BadRequestException("User not found"));
 
         RefreshToken usedToken = createAndSaveToken(user, true, Instant.now().plus(15, ChronoUnit.MINUTES));
 
@@ -128,7 +129,7 @@ public class RefreshTokenServiceImplTest {
         testUserUtil.registerUserIfNotExists();
 
         User user = userRepository.findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow( () -> new RuntimeException("User not found"));
+                .orElseThrow( () -> new BadRequestException("User not found"));
         // Given: one expired, one used, one valid
         createAndSaveToken(user, true, Instant.now().plus(15, ChronoUnit.MINUTES)); // used
         createAndSaveToken(user, false, Instant.now().minus(40, ChronoUnit.DAYS)); // expired

@@ -11,6 +11,13 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    /**
+     * Configures CORS settings for the application.
+     * <p>
+     * This method sets up allowed origins, methods, headers, and other CORS-related configurations.
+     *
+     * @return a CorsConfigurationSource object with the configured CORS settings
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

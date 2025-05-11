@@ -9,6 +9,7 @@ import com.project.spring_project.entity.Role;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.dto.request.AuthRequest;
 import com.project.spring_project.dto.request.RegisterRequest;
+import com.project.spring_project.exception.BadRequestException;
 import com.project.spring_project.utils.TestUserUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -188,7 +189,7 @@ public class AuthControllerTest extends BaseTest {
     void testLoginWithLockedUser_shouldFail() throws Exception {
         // Lock the user
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         user.setAccountLocked(true);
         testUserUtil.getUserRepository().save(user);
 
@@ -288,7 +289,7 @@ public class AuthControllerTest extends BaseTest {
     @Test
     void sendRecoveryRequest_existingEmail_returnsOkAndSendsToken() throws Exception {
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         // Delete any existing token for the user however this is not necessary
         testUserUtil.deletePasswordResetToken(user.getId());
 
@@ -303,7 +304,7 @@ public class AuthControllerTest extends BaseTest {
     @Test
     void sendRecoveryRequest_nonExistentEmail_returnsOkButNoTokenLeak() throws Exception {
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         // Delete any existing token for the user however this is not necessary
         testUserUtil.deletePasswordResetToken(user.getId());
 
@@ -318,7 +319,7 @@ public class AuthControllerTest extends BaseTest {
     @Test
     void passwordReset_withValidToken_updatesPassword() throws Exception {
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         // Delete any existing token for the user however this is not necessary
         testUserUtil.deletePasswordResetToken(user.getId());
 
@@ -338,7 +339,7 @@ public class AuthControllerTest extends BaseTest {
                 .andExpect(status().isOk());
 
         User updatedUser = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
 
         assertTrue(testUserUtil.getPasswordService().matches(newPassword, updatedUser.getPassword()));
     }
@@ -346,7 +347,7 @@ public class AuthControllerTest extends BaseTest {
     @Test
     void passwordReset_withExpiredToken_fails() throws Exception {
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         // Delete any existing token for the user however this is not necessary
         testUserUtil.deletePasswordResetToken(user.getId());
 
@@ -379,7 +380,7 @@ public class AuthControllerTest extends BaseTest {
     @Test
     void passwordReset_withReusedToken_failsSecondTime() throws Exception {
         User user = testUserUtil.getUserRepository().findByUsername(testUserUtil.getTestUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
         // Delete any existing token for the user however this is not necessary
         testUserUtil.deletePasswordResetToken(user.getId());
 

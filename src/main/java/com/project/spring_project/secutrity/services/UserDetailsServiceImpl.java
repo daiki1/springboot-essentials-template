@@ -16,6 +16,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
     private final LocalizationService localizationService;
 
+    /**
+     * Loads user details by username.
+     *
+     * @param username the username of the user
+     * @return a CustomUserDetails object containing user details
+     * @throws UsernameNotFoundException if the user is not found
+     */
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)

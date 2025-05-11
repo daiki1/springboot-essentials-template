@@ -16,6 +16,13 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    /**
+     * Returns the authorities granted to the user.
+     * <p>
+     * This method maps the user's roles to Spring Security's GrantedAuthority.
+     *
+     * @return a collection of GrantedAuthority representing the user's roles
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getRoles().stream()

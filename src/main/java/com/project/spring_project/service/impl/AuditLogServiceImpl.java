@@ -4,6 +4,8 @@ import com.project.spring_project.entity.AuditLog;
 import com.project.spring_project.repository.AuditLogRepository;
 import com.project.spring_project.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +17,13 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
+    /**
+     * Logs an audit entry for a specific user operation.
+     *
+     * @param userId   The ID of the user performing the operation.
+     * @param operation The type of operation performed.
+     * @param details   Additional details about the operation.
+     */
     @Override
     public void logAudit(Long userId, String operation, String details) {
         AuditLog auditLog = new AuditLog();
@@ -26,8 +35,14 @@ public class AuditLogServiceImpl implements AuditLogService {
         auditLogRepository.save(auditLog);
     }
 
+    /**
+     * Retrieves all audit logs.
+     *
+     * @param pageable Pagination information.
+     * @return A list of audit logs.
+     */
     @Override
-    public List<AuditLog> getAllAuditLogs() {
-        return auditLogRepository.findAll();
+    public Page<AuditLog> getAllAuditLogs(Pageable pageable) {
+        return auditLogRepository.findAll(pageable);
     }
 }

@@ -5,6 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a request to send an email.
+ * <p>
+ * This class is used to encapsulate the email address that needs to be validated and sent.
+ */
 @Getter
 @Setter
 public class EmailRequest {

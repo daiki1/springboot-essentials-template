@@ -6,6 +6,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * Represents a Data Transfer Object (DTO) for user information.
+ * <p>
+ * This class is used to encapsulate user-related data that is transferred between the server and client.
+ */
 @Getter
 @Setter
 public class UserDto {

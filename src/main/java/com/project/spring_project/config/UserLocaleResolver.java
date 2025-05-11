@@ -21,6 +21,15 @@ public class UserLocaleResolver extends AcceptHeaderLocaleResolver {
     @Value("${app.locale.default:en}")
     String defaultLang;
 
+    /**
+     * Resolves the locale based on the user's authentication and preferences.
+     * <p>
+     * This method checks if the user is authenticated and retrieves their language preference.
+     * If no preference is found, it falls back to the Accept-Language header or the default language.
+     *
+     * @param request the HttpServletRequest object
+     * @return the resolved Locale object
+     */
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         // Check if the user is authenticated and retrieve their language preference

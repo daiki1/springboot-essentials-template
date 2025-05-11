@@ -27,6 +27,13 @@ public class EmailServiceImpl implements EmailService {
         System.out.println("checkMailConfig:: mailUsername: " + mailUsername);
     }
 
+    /**
+     * Sends a plain text email.
+     *
+     * @param to      Recipient's email address.
+     * @param subject Subject of the email.
+     * @param body    Body of the email.
+     */
     @Override
     public void sendPlainTextEmail(String to, String subject, String body) {
         if (disableEmails) {

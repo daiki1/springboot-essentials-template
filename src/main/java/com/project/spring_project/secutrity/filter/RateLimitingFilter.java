@@ -20,6 +20,15 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private final RateLimitingService rateLimitingService;
     private final LocalizationService localizationService;
 
+    /**
+     * Retrieves the client's IP address from the request.
+     * <p>
+     * This method checks for the "X-Forwarded-For" header to get the original client IP
+     * when the application is behind a proxy or load balancer.
+     *
+     * @param request the HttpServletRequest object
+     * @return the client's IP address as a String
+     */
     private String getClientIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader != null && !xfHeader.isEmpty()) {
@@ -28,6 +37,19 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         return request.getRemoteAddr();
     }
 
+    /**
+     * Filters incoming requests to apply rate limiting.
+     * <p>
+     * This method checks if the request URI starts with "/api/auth/" and applies rate limiting
+     * based on the client's IP address. If the limit is exceeded, a 429 Too Many Requests response
+     * is sent back to the client.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @param filterChain the FilterChain object for further processing
+     * @throws ServletException if an error occurs during filtering
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

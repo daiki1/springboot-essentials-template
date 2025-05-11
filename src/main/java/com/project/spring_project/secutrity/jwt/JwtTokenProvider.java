@@ -50,7 +50,14 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Method to extract claims from the token
+    /**
+     * Extracts claims from the provided JWT token.
+     * <p>
+     * This method uses the SecretKey to parse the token and retrieve its claims.
+     *
+     * @param token the JWT token
+     * @return the claims contained in the token
+     */
     public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)  // Use the SecretKey here
@@ -59,6 +66,14 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
+    /**
+     * Generates a JWT token for the given authentication.
+     * <p>
+     * This method creates a token with the username, roles, user ID, and email as claims.
+     *
+     * @param authentication the authentication object
+     * @return the generated JWT token
+     */
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         Date now = new Date();
@@ -83,6 +98,14 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Generates a JWT token for the given user.
+     * <p>
+     * This method creates a token with the username and roles as claims.
+     *
+     * @param user the user object
+     * @return the generated JWT token
+     */
     public String generateToken(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
@@ -93,16 +116,38 @@ public class JwtTokenProvider {
         return generateToken(authentication); // delegate to your existing method
     }
 
-    // Method to get the expiration date of the token
+    /**
+     * Retrieves the expiration date from the provided JWT token.
+     * <p>
+     * This method uses the SecretKey to parse the token and retrieve its expiration date.
+     *
+     * @param token the JWT token
+     * @return the expiration date of the token
+     */
     public Date getExpirationDate(String token) {
         return getClaims(token).getExpiration();
     }
 
-    // Check if the token is expired
+    /**
+     * Checks if the provided JWT token is expired.
+     * <p>
+     * This method compares the expiration date of the token with the current date.
+     *
+     * @param token the JWT token
+     * @return true if the token is expired, false otherwise
+     */
     public boolean isTokenExpired(String token) {
         return getExpirationDate(token).before(new Date());
     }
 
+    /**
+     * Validates the provided JWT token.
+     * <p>
+     * This method checks if the token is expired and if the issuer and audience match the expected values.
+     *
+     * @param token the JWT token
+     * @return true if the token is valid, false otherwise
+     */
     public boolean validateToken(String token) {
         try {
             Claims claims = getClaims(token);
@@ -116,14 +161,29 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * Retrieves the username from the provided JWT token.
+     * <p>
+     * This method uses the SecretKey to parse the token and retrieve the username.
+     *
+     * @param token the JWT token
+     * @return the username contained in the token
+     */
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 
-    // Method to log the claims of the token
-    // This is just for demonstration purposes
+    /**
+     * Logs the claims of the provided JWT token.
+     * <p>
+     * This method uses the SecretKey to parse the token and retrieve its claims.
+     *
+     * This is just for demonstration purposes
+     *
+     * @param token the JWT token
+     */
     public void logTokenClaims(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -138,6 +198,14 @@ public class JwtTokenProvider {
         System.out.println("Expiration: " + claims.getExpiration());
     }
 
+    /**
+     * Generates a refresh token for the given authentication.
+     * <p>
+     * This method creates a token with the username as the subject and sets an expiration date.
+     *
+     * @param authentication the authentication object
+     * @return the generated refresh token
+     */
     public String generateRefreshToken(Authentication authentication) {
         String username = authentication.getName();
         Date now = new Date();

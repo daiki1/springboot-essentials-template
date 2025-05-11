@@ -49,6 +49,12 @@ public class AuthServiceImpl implements AuthService {
     private final AuditLogService auditLogService;
     private final LocalizationService localizationService;
 
+    /**
+     * This method is used to authenticate a user and generate a JWT token.
+     *
+     * @param request the authentication request containing username and password
+     * @return AuthResponse containing the JWT token and refresh token
+     */
     @Override
     @Transactional
     public AuthResponse login(AuthRequest request) {
@@ -107,6 +113,11 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * This method is used to register a new user.
+     *
+     * @param request the registration request containing user details
+     */
     @Override
     public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -130,6 +141,11 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
+    /**
+     * This method is used to request a password reset.
+     *
+     * @param email the email address of the user requesting the password reset
+     */
     @Override
     public void requestPasswordReset(String email) {
         User user = userRepository.findByEmail(email)
@@ -161,6 +177,12 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * This method is used to reset the password using the provided token.
+     *
+     * @param token       the password reset token
+     * @param newPassword the new password
+     */
     @Override
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
@@ -182,7 +204,11 @@ public class AuthServiceImpl implements AuthService {
         passwordResetTokenRepository.save(resetToken);
     }
 
-    // This method is used in the test class to delete the test user
+    /**
+     * This method is used to delete a test user.
+     *
+     * @param username the username of the test user to be deleted
+     */
     @Override
     @Transactional
     public void deleteTestUser(String username) {

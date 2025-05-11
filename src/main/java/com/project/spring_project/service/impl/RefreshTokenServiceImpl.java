@@ -4,6 +4,7 @@ import com.project.spring_project.entity.RefreshToken;
 import com.project.spring_project.entity.User;
 import com.project.spring_project.dto.request.RefreshTokenRequest;
 import com.project.spring_project.dto.response.AuthResponse;
+import com.project.spring_project.exception.BadRequestException;
 import com.project.spring_project.repository.RefreshTokenRepository;
 import com.project.spring_project.repository.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
@@ -36,6 +37,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         this.localizationService = localizationService;
     }
 
+    /**
+     * Generates a new refresh token for the user.
+     *
+     * @param user The user for whom the refresh token is generated.
+     * @return The generated refresh token.
+     */
     @Override
     public RefreshToken createRefreshToken(User user) {
         String rawToken = UUID.randomUUID().toString();
@@ -52,21 +59,27 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return token;
     }
 
+    /**
+     * Validates the refresh token and generates a new access token.
+     *
+     * @param request The request containing the refresh token.
+     * @return The response containing the new access token and refresh token.
+     */
     @Override
     public AuthResponse refreshAccessToken(RefreshTokenRequest request) {
         String hashedToken = hashedToken(request.getRefreshToken());
         RefreshToken token = refreshTokenRepository.findByTokenHash(hashedToken)
-                .orElseThrow(() -> new RuntimeException(localizationService.get("token.refresh.invalid")));
+                .orElseThrow(() -> new BadRequestException(localizationService.get("token.refresh.invalid")));
 
         if (token.isUsed() || token.getExpiryDate().isBefore(Instant.now())) {
-            throw new RuntimeException(localizationService.get("token.refresh.used"));
+            throw new BadRequestException(localizationService.get("token.refresh.used"));
         }
 
         token.setUsed(true);
         refreshTokenRepository.save(token);
 
         User user = userRepository.findById(token.getUser().getId())
-                .orElseThrow(() -> new RuntimeException(localizationService.get("user.not.found")));
+                .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.not.found")));
 
         String jwt = jwtService.generateToken(user);
         String encodedToken = TokenUtils.hashedToken(jwt);
@@ -79,6 +92,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return new AuthResponse(jwt, newToken.getRawToken());
     }
 
+    /**
+     * Deletes all refresh tokens associated with the user.
+     *
+     * @param user The user whose refresh tokens are to be deleted.
+     */
     @Override
     @Scheduled(cron = "0 0 3 * * ?") // Runs daily at 3 AM
     @Transactional
