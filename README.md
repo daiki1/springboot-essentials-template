@@ -87,15 +87,6 @@ spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
-### 3. Swagger UI
-- The API documentation is generated using SpringDoc OpenAPI UI.
-- Access via: http://localhost:8080/swagger-ui.html
-- You can also access the API documentation in JSON format at: http://localhost:8080/v3/api-docs
-- With the login get a token and use it in the Swagger UI to test the endpoints, press the "Authorize" button and enter the token in the input field.
-- You can enable/disable the Swagger UI in production by setting the following property in `application-prod.properties`:
-``` properties
-springdoc.api-docs.enabled=false
-```
 
 ### 3. Configurable session login for users
 - You can configure the session login in `application.properties` file.
@@ -176,6 +167,11 @@ spring.liquibase.enabled=false
 ## Swagger / API Docs
 - API documentation is generated using SpringDoc OpenAPI UI.
 - Access via: http://localhost:8080/swagger-ui.html (or /swagger-ui/index.html)
+- With the login get a token and use it in the Swagger UI to test the endpoints, press the "Authorize" button and enter the token in the input field.
+- You can enable/disable the Swagger UI in production by setting the following property in `application-prod.properties`:
+``` properties
+springdoc.api-docs.enabled=false
+```
 
 ## Using Profiles
 
