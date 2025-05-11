@@ -1,13 +1,19 @@
 <p style="color:red;"><strong>⚠️ Work in Progress:</strong> This project is currently under development. Features and structure may change frequently until it's stable.</p>
  
-# A. Spring Boot API Starter Template
+# Spring Boot API Starter Template
 
 Production-ready Spring Boot REST API project to kickstart any backend application with modern essentials — built with simplicity, scalability, and maintainability in mind.
 
 ⚠️ *This is a personal portfolio project. You are free to view and learn from the code. Please do not use it as-is in commercial projects.*
 
-
 ---
+
+## Table of Contents
+- [Features](#features)
+- [Tools & Technologies](#tools--technologies)
+- [Getting Started](#getting-started)
+- [Development Notes](#developing-notes)
+- [Production Considerations](#production-considerations)
 
 ## Features
 
@@ -16,7 +22,7 @@ Production-ready Spring Boot REST API project to kickstart any backend applicati
 - MySQL Database Integration
 - JWT Authentication & Role-Based Access Control
 - Configurable one session per user or multiple sessions 
-- Single session login or multiple sessions configurable in `application.properties` 
+- Configurable session management: single or multiple logins per user in `application.properties` 
 - DTO Mapping with MapStruct
 - RESTful API with CRUD examples
 - Auditing for all database operations (create, update, delete, login)
@@ -81,7 +87,6 @@ cd springboot-essentials-template
 - Update the `application.properties` file with your database credentials.
 - User table will be created automatically. The first user is admin with role `ROLE_ADMIN` and no password.
 - Use the reset password endpoint to set the password for the first user. Use: `/api/auth/request-password-reset` check the token generated in `password_reset_tokens` table, and use `/api/auth/reset-password` to set the password. 
-- The first user has id 2, the id 1 is reserved for test purposes using Unit tests.
 ``` properties
 spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
 spring.datasource.username=your_username
@@ -112,25 +117,25 @@ app.jwtExpirationInMs=900000
 app.jwtRefreshExpirationMs=604800000
 ```
 - Everytime the token expires, call the `/api/auth/refresh` endpoint to get a new token using the refresh token.
-- If the refresh token expires, you will need to login again to get a new access token and refresh token.
+- If the refresh token expires, you will need to log in again to get a new access token and refresh token.
 
-# B. While Developing
+## Developing Notes
 <details>
 <summary>Click to open: This section includes helpful notes, practices, and important instructions to consider during development:</summary>
 
-## Unit tests
+### Unit tests
 - Use the command below to run all unit tests:
 ``` bash
 mvn test
 ```
 
-## User for testing
+### User for testing
 - The first user is admin with role `ROLE_ADMIN` and password `admin`.
 
-## Table Management
+### Table Management
 - This project uses Liquibase for managing database schema changes.
-- The project could use JPA hibernate to create tables automatically during development, however, this is not recommended for production and liquidbase requires to create all the tables manually to work on production. 
-- So, for development if you dont want to use liquibase, you can set the following property in `application.properties`:
+- JPA Hibernate can create tables automatically during development, but this is not recommended for production. 
+- So, for development if you don't want to use liquibase, you can set the following property in `application.properties`:
 
 ``` properties
 spring.jpa.hibernate.ddl-auto=update
@@ -138,7 +143,7 @@ spring.liquibase.enabled=false
 ```
 - Remember that once in production, you need to create all the tables manually in the changelog, and set the property `spring.jpa.hibernate.ddl-auto` to `none` and `spring.liquibase.enabled` to `true`.
 
-## File Structure Highlights
+### File Structure Highlights
 - src/main/java/.../entity: All JPA entities
 - src/main/java/.../dto: DTOs to decouple API from database models
 - src/main/java/.../mapper: Uses MapStruct for mapping entities <-> DTOs
@@ -146,25 +151,25 @@ spring.liquibase.enabled=false
 - src/main/resources/db/changelog: Liquibase changelogs
 - src/main/resources/messages_{lang}.properties: Internationalization files (i18n)
 
-## Cors
+### Cors
 - CORS is enabled for all origins in `CorsConfig.java`.
 - You can customize it to restrict access to specific domains.
 
-## Internationalization
+### Internationalization
 - Messages are loaded from messages_en.properties, messages_es.properties, etc.
 - Customize Spring messages (like validation or login errors) based on user locale.
 
-## Testing
+### Testing
 - Use JUnit 5 for unit and integration tests.
 - Mock services and repositories where applicable.
 - Add tests for critical logic (authentication, CRUD, mappers).
 
-## Logs
+### Logs
 - Logs are written to logs/application.log.
 - Logging is configured in application.properties.
 - You can adjust levels (INFO, DEBUG, ERROR) as needed.
 
-## Swagger / API Docs
+### Swagger / API Docs
 - API documentation is generated using SpringDoc OpenAPI UI.
 - Access via: http://localhost:8080/swagger-ui.html (or /swagger-ui/index.html)
 - With the login get a token and use it in the Swagger UI to test the endpoints, press the "Authorize" button and enter the token in the input field.
@@ -173,13 +178,13 @@ spring.liquibase.enabled=false
 springdoc.api-docs.enabled=false
 ```
 
-## Using Profiles
+### Using Profiles
 
-### Application uses Spring profiles:
+#### Application uses Spring profiles:
 - dev (default): for local development
 - prod: for production environment
 
-### Set active profile using:
+#### Set active profile using:
 ```bash
 --spring.profiles.active=dev
 ```
@@ -188,11 +193,11 @@ springdoc.api-docs.enabled=false
 ```
 </details>
 
-# C. Once in Production
+## Production Considerations
 <details>
 <summary>Click to open: This section includes helpful notes, practices, and important instructions to consider once the application is in production.</summary>
 
-## Set active profile to prod
+### Set active profile to prod
 - Set the active profile to `prod` in your production environment.
 - This will ensure that the application uses production-specific configurations.
 - Change the database URL, username, and password in `application-prod.properties` to point to your production database.
@@ -201,16 +206,16 @@ springdoc.api-docs.enabled=false
 --spring.profiles.active=prod
 ```
 
-## Avoid using JPA hibernate to create tables automatically
+### Avoid using JPA hibernate to create tables automatically
 - In production, you should not use JPA hibernate to create tables automatically.
 - Instead, use Liquibase to manage your database schema.
 - Make sure to create all the tables manually in the changelog.
 - Using ddl-auto=true in production can lead to data loss or corruption.
 
-## Avoid using default passwords
+### Avoid using default passwords
 - Do not use default passwords in production.
 
-## Avoid using "*" for CORS
+### Avoid using "*" for CORS
 - In production, you should restrict CORS to specific domains.
 - Using "*" allows any domain to access your API, which can be a security risk.
 - Update the CORS configuration CorsConfig.java to allow only trusted domains.
