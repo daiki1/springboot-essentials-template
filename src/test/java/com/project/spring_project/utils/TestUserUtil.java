@@ -1,13 +1,13 @@
 package com.project.spring_project.utils;
 
-import com.project.spring_project.entity.PasswordResetToken;
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.PasswordResetToken;
+import com.project.spring_project.entity.user.User;
 import com.project.spring_project.dto.request.RegisterRequest;
-import com.project.spring_project.repository.PasswordResetTokenRepository;
-import com.project.spring_project.repository.RoleRepository;
-import com.project.spring_project.repository.UserRepository;
+import com.project.spring_project.repository.user.PasswordResetTokenRepository;
+import com.project.spring_project.repository.user.RoleRepository;
+import com.project.spring_project.repository.user.UserRepository;
 import com.project.spring_project.secutrity.services.PasswordService;
-import com.project.spring_project.service.AuthService;
+import com.project.spring_project.service.user.AuthService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

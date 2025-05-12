@@ -1,7 +1,7 @@
 package com.project.spring_project.security.jwt;
 
-import com.project.spring_project.entity.Role;
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.Role;
+import com.project.spring_project.entity.user.User;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
 import com.project.spring_project.secutrity.services.CustomUserDetails;
 import io.jsonwebtoken.Jwts;

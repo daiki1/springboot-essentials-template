@@ -1,8 +1,8 @@
 package com.project.spring_project.secutrity.services;
 
 
-import com.project.spring_project.entity.User;
-import com.project.spring_project.repository.UserRepository;
+import com.project.spring_project.entity.user.User;
+import com.project.spring_project.repository.user.UserRepository;
 import com.project.spring_project.util.LocalizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;

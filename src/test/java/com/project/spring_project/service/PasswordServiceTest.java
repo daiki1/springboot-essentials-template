@@ -1,6 +1,6 @@
 package com.project.spring_project.service;
 
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.User;
 import com.project.spring_project.utils.TestUserUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

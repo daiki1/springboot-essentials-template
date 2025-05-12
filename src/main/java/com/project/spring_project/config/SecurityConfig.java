@@ -89,6 +89,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/auditor/**").hasRole("AUDITOR")
                         .requestMatchers("/api/user/**").hasRole("USER")
+                        .requestMatchers("/api/countries/**").permitAll()
+                        .requestMatchers("/api/states/**").permitAll()
+                        .requestMatchers("/api/cities/**").permitAll()
+
 
                         .requestMatchers( //Doc endpoints
                                 "/v3/api-docs/**",

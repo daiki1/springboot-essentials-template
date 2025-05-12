@@ -1,12 +1,11 @@
 package com.project.spring_project.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.spring_project.BaseTest;
 import com.project.spring_project.dto.response.AuthResponse;
-import com.project.spring_project.entity.PasswordResetToken;
-import com.project.spring_project.entity.Role;
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.PasswordResetToken;
+import com.project.spring_project.entity.user.Role;
+import com.project.spring_project.entity.user.User;
 import com.project.spring_project.dto.request.AuthRequest;
 import com.project.spring_project.dto.request.RegisterRequest;
 import com.project.spring_project.exception.BadRequestException;

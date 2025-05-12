@@ -1,13 +1,13 @@
 package com.project.spring_project.service;
 
-import com.project.spring_project.entity.RefreshToken;
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.RefreshToken;
+import com.project.spring_project.entity.user.User;
 import com.project.spring_project.dto.request.RefreshTokenRequest;
 import com.project.spring_project.exception.BadRequestException;
-import com.project.spring_project.repository.RefreshTokenRepository;
-import com.project.spring_project.repository.UserRepository;
+import com.project.spring_project.repository.user.RefreshTokenRepository;
+import com.project.spring_project.repository.user.UserRepository;
 import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
-import com.project.spring_project.service.impl.RefreshTokenServiceImpl;
+import com.project.spring_project.service.impl.user.RefreshTokenServiceImpl;
 import com.project.spring_project.util.LocalizationService;
 import com.project.spring_project.util.TokenUtils;
 import com.project.spring_project.utils.TestUserUtil;

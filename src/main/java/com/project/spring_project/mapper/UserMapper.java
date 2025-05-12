@@ -1,8 +1,8 @@
 package com.project.spring_project.mapper;
 
 import com.project.spring_project.dto.UserDto;
-import com.project.spring_project.entity.Role;
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.Role;
+import com.project.spring_project.entity.user.User;
 import org.mapstruct.*;
 
 import java.util.HashSet;

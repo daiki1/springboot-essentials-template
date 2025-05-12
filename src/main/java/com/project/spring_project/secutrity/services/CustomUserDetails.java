@@ -1,6 +1,6 @@
 package com.project.spring_project.secutrity.services;
 
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

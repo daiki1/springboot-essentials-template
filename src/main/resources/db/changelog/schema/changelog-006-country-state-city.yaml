@@ -1,0 +1,136 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-countries-table
+      author: Omar
+      changes:
+        - createTable:
+            tableName: countries
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: iso3
+                  type: VARCHAR(3)
+              - column:
+                  name: iso2
+                  type: VARCHAR(2)
+              - column:
+                  name: phonecode
+                  type: VARCHAR(255)
+              - column:
+                  name: capital
+                  type: VARCHAR(255)
+              - column:
+                  name: currency
+                  type: VARCHAR(255)
+              - column:
+                  name: native
+                  type: VARCHAR(255)
+              - column:
+                  name: region
+                  type: VARCHAR(255)
+              - column:
+                  name: subregion
+                  type: VARCHAR(255)
+              - column:
+                  name: latitude
+                  type: DECIMAL(10, 8)
+              - column:
+                  name: longitude
+                  type: DECIMAL(11, 8)
+              - column:
+                  name: emojiU
+                  type: VARCHAR(191)
+  - changeSet:
+      id: create-states-table
+      author: Omar
+      changes:
+        - createTable:
+            tableName: states
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: country_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: latitude
+                  type: DECIMAL(10, 8)
+              - column:
+                  name: longitude
+                  type: DECIMAL(11, 8)
+        - addForeignKeyConstraint:
+            baseTableName: states
+            baseColumnNames: country_id
+            referencedTableName: countries
+            referencedColumnNames: id
+            constraintName: fk_state_country
+  - changeSet:
+      id: create-cities-table
+      author: Omar
+      changes:
+        - createTable:
+            tableName: cities
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                    name: state_id
+                    type: BIGINT
+                    constraints:
+                        nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: latitude
+                  type: DECIMAL(10, 8)
+              - column:
+                  name: longitude
+                  type: DECIMAL(11, 8)
+        - addForeignKeyConstraint:
+            baseTableName: cities
+            baseColumnNames: state_id
+            referencedTableName: states
+            referencedColumnNames: id
+            constraintName: fk_city_state
+  - changeSet:
+      id: update-emoji-columns-to-utf8mb4
+      author: Omar
+      changes:
+        - sql:
+              sql: >
+                ALTER TABLE countries
+                MODIFY native VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        - sql:
+            sql: >
+              ALTER TABLE countries
+              MODIFY emojiu VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        - sql:
+            sql: >
+              ALTER TABLE states
+              MODIFY name VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        - sql:
+            sql: >
+              ALTER TABLE cities
+              MODIFY name VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

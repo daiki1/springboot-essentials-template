@@ -1,7 +1,7 @@
 package com.project.spring_project.config;
 
-import com.project.spring_project.entity.User;
-import com.project.spring_project.repository.UserRepository;
+import com.project.spring_project.entity.user.User;
+import com.project.spring_project.repository.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

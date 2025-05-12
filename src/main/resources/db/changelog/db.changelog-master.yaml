@@ -14,3 +14,5 @@ databaseChangeLog:
       file: db/changelog/schema/changelog-004-add-audit-log.yaml
   - include:
       file: db/changelog/schema/changelog-005-user-language.yaml
+  - include:
+      file: db/changelog/schema/changelog-006-country-state-city.yaml

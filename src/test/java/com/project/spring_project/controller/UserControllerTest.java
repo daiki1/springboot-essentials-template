@@ -2,10 +2,10 @@ package com.project.spring_project.controller;
 
 import com.project.spring_project.dto.request.AuthRequest;
 import com.project.spring_project.dto.response.AuthResponse;
-import com.project.spring_project.entity.Role;
-import com.project.spring_project.entity.User;
+import com.project.spring_project.entity.user.Role;
+import com.project.spring_project.entity.user.User;
 import com.project.spring_project.exception.BadRequestException;
-import com.project.spring_project.service.AuthService;
+import com.project.spring_project.service.user.AuthService;
 import com.project.spring_project.utils.TestUserUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
