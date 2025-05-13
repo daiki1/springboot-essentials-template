@@ -9,7 +9,7 @@ import com.project.spring_project.repository.location.CountryRepository;
 import com.project.spring_project.repository.location.StateRepository;
 import com.project.spring_project.util.obj.LocationHelper;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +27,6 @@ public class LocationDataLoader implements CommandLineRunner {
     private final StateRepository stateRepo;
     private final CityRepository cityRepo;
     private final ObjectMapper objectMapper;
-
-    //@Value("${import.location.data}")
-    //private boolean importData;
 
     /**
      * Loads country, state, and city data from JSON files into the database.
@@ -71,9 +68,11 @@ public class LocationDataLoader implements CommandLineRunner {
         List<LocationHelper> citiesHelper = Arrays.asList(objectMapper.readValue(cityInputDto, LocationHelper[].class));
         Map<Long, LocationHelper> LocationHelperMap1 = citiesHelper.stream()
                 .collect(Collectors.toMap(LocationHelper::getId, c -> c));
+        Map<Long, State> stateMap = stateRepo.findAll().stream()
+                .collect(Collectors.toMap(State::getId, s -> s));
         for (City city : cities) {
             LocationHelper LocationHelper = LocationHelperMap1.get(city.getId());
-            city.setState(stateRepo.findById(LocationHelper.getState_id()).orElse(null));
+            city.setState(stateMap.get(LocationHelper.getState_id()));
         }
         cityRepo.saveAll(cities);
     }

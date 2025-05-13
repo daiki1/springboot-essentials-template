@@ -34,7 +34,7 @@ Production-ready Spring Boot REST API project to kickstart any backend applicati
 - Environment-based configuration: `dev`, `prod`
 - Unit & Integration Tests (JUnit, Mockito)
 - Clean Architecture: Controller, Service, Repository, DTO, Mapper
-- Sample Data: Countries, States, Cities API with Pagination & Sorting (Importing this data is optional and may take a while)
+- Sample Data: Countries, States, Cities API (Importing may take a while only first time)
 
 ---
 
