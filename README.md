@@ -127,9 +127,6 @@ app.jwtRefreshExpirationMs=604800000
 mvn test
 ```
 
-### User for testing
-- The first user is admin with role `ROLE_ADMIN` and password `admin`.
-
 ### Table Management
 - This project uses Liquibase for managing database schema changes.
 - JPA Hibernate can create tables automatically during development, but this is not recommended for production. 
