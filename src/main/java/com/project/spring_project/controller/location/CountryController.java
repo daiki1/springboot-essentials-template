@@ -1,37 +1,40 @@
 package com.project.spring_project.controller.location;
 
 import com.project.spring_project.dto.locationDto.CountryDto;
+import com.project.spring_project.dto.locationDto.StateDto;
 import com.project.spring_project.service.location.CountryService;
+import com.project.spring_project.service.location.StateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/countries")
 @RequiredArgsConstructor
 public class CountryController {
     private final CountryService countryService;
+    private final StateService stateService;
 
     /**
      * Retrieves all countries from the repository.
      *
      * @return a list of all countries
      */
-    @Operation(summary = "Get all countries", description = "Retrieves a paginated list of all countries.",
+    @Operation(summary = "Get all countries", description = "Retrieves a list of all countries.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "countries retrieved successfully"),
             }
     )
     @GetMapping
-    public Page<CountryDto> getAllCountries(Pageable pageable) {
-        return countryService.getAllCountries(pageable);
+    public List<CountryDto> getAllCountries( ) {
+        return countryService.getAllCountries();
     }
 
     /**
@@ -51,5 +54,22 @@ public class CountryController {
         return countryService.getCountry(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Retrieves all states of a country by its ID.
+     *
+     * @param countryId the ID of the country whose states to retrieve
+     * @return a list of states belonging to the specified country
+     */
+    @Operation(summary = "Get all states of a country", description = "Retrieves a list of all states of a country.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "States retrieved successfully"),
+            }
+    )
+    @GetMapping("/{countryId}/states")
+    public ResponseEntity<List<StateDto>> getStatesByCountry(@PathVariable Long countryId) {
+        List<StateDto> states = stateService.getStatesByCountry(countryId);
+        return ResponseEntity.ok(states);
     }
 }

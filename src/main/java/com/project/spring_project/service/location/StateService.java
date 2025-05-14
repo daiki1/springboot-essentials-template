@@ -1,12 +1,11 @@
 package com.project.spring_project.service.location;
 
 import com.project.spring_project.dto.locationDto.StateDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StateService {
-    Page<StateDto> getAllStates(Pageable pageable);
+    List<StateDto> getStatesByCountry(Long countryId);
     Optional<StateDto> getState(Long id);
 }

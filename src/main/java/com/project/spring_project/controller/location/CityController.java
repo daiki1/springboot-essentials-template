@@ -5,8 +5,6 @@ import com.project.spring_project.service.location.CityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,21 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CityController {
     private final CityService cityService;
-
-    /**
-     * Retrieves all cities from the repository.
-     *
-     * @return a list of all cities
-     */
-    @Operation(summary = "Get all cities", description = "Retrieves a paginated list of all cities.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Cities retrieved successfully")
-            }
-    )
-    @GetMapping
-    public Page<CityDto> getAllCities(Pageable pageable) {
-        return cityService.getAllCities(pageable);
-    }
 
     /**
      * Retrieves a city by its ID.

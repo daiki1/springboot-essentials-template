@@ -38,18 +38,7 @@ public class CityControllerTest {
         testCity = cityRepository.save(new City(999999L, "Test City", 10.0, 20.0, state));
     }
 
-    @Test
-    void testGetPaginatedCities() throws Exception {
-        mockMvc.perform(get("/api/cities")
-                        .param("page", "0")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content.length()").value(lessThanOrEqualTo(10)))
-                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
-                .andExpect(jsonPath("$.size").value(10))
-                .andExpect(jsonPath("$.totalElements").isNumber());
-    }
+
 
     @Test
     void testGetCityById() throws Exception {

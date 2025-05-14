@@ -1,5 +1,3 @@
-<p style="color:red;"><strong>⚠️ Work in Progress:</strong> This project is currently under development. Features and structure may change frequently until it's stable.</p>
- 
 # Spring Boot API Starter Template
 
 Production-ready Spring Boot REST API project to kickstart any backend application with modern essentials — built with simplicity, scalability, and maintainability in mind.

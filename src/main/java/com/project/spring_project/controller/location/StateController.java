@@ -1,38 +1,23 @@
 package com.project.spring_project.controller.location;
 
+import com.project.spring_project.dto.locationDto.CityDto;
 import com.project.spring_project.dto.locationDto.StateDto;
+import com.project.spring_project.service.location.CityService;
 import com.project.spring_project.service.location.StateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/states")
 @RequiredArgsConstructor
 public class StateController {
     private final StateService stateService;
-
-    /**
-     * Retrieves all states from the repository.
-     *
-     * @return a list of all states
-     */
-    @Operation(summary = "Get all states", description = "Retrieves a paginated list of all states.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "States retrieved successfully"),
-            }
-    )
-    @GetMapping
-    public Page<StateDto> getAllStates(Pageable pageable) {
-        return stateService.getAllStates(pageable);
-    }
+    private final CityService cityService;
 
     /**
      * Retrieves a state by its ID.
@@ -51,5 +36,15 @@ public class StateController {
         return stateService.getState(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{stateId}/cities")
+    public ResponseEntity<Page<CityDto>> getCitiesByState(
+            @PathVariable Long stateId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<CityDto> cities = cityService.getCitiesByState(stateId, page, size);
+        return ResponseEntity.ok(cities);
     }
 }

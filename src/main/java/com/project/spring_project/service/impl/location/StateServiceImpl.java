@@ -5,11 +5,11 @@ import com.project.spring_project.mapper.location.StateMapper;
 import com.project.spring_project.repository.location.StateRepository;
 import com.project.spring_project.service.location.StateService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,9 +23,11 @@ public class StateServiceImpl implements StateService {
      * @return a list of all states
      */
     @Override
-    public Page<StateDto> getAllStates(Pageable pageable) {
-        return stateRepository.findAll(pageable)
-                .map(stateMapper::toDto);
+    public List<StateDto> getStatesByCountry(Long countryId) {
+        return stateRepository.findByCountryId(countryId)
+                .stream()
+                .map(stateMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     /**

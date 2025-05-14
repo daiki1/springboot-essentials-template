@@ -6,6 +6,7 @@ import com.project.spring_project.repository.location.CityRepository;
 import com.project.spring_project.service.location.CityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,9 @@ public class CityServiceImpl implements CityService {
      * @return a list of all cities
      */
     @Override
-    public Page<CityDto> getAllCities(Pageable pageable) {
-        return cityRepository.findAll(pageable)
+    public Page<CityDto> getCitiesByState(Long stateId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cityRepository.findByStateId(stateId, pageable)
                 .map(cityMapper::toDto);
     }
 

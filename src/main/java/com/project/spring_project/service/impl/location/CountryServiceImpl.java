@@ -5,10 +5,9 @@ import com.project.spring_project.mapper.location.CountryMapper;
 import com.project.spring_project.repository.location.CountryRepository;
 import com.project.spring_project.service.location.CountryService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,9 +22,11 @@ public class CountryServiceImpl implements CountryService {
      * @return a list of all countries
      */
     @Override
-    public Page<CountryDto> getAllCountries(Pageable pageable) {
-        return countryRepository.findAll(pageable)
-                .map(countryMapper::toDto);
+    public List<CountryDto> getAllCountries() {
+        return countryRepository.findAll()
+                .stream()
+                .map(countryMapper::toDto)
+                .toList();
     }
 
     /**
