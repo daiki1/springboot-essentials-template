@@ -11,6 +11,7 @@ import com.project.spring_project.secutrity.jwt.JwtTokenProvider;
 import com.project.spring_project.util.LocalizationService;
 import com.project.spring_project.service.user.RefreshTokenService;
 import com.project.spring_project.util.TokenUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import static com.project.spring_project.util.TokenUtils.hashedToken;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
+
+    @Value("${app.oneSingleSignOn}")
+    private boolean oneSingleSignOn;
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtService;
@@ -75,11 +80,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             throw new BadRequestException(localizationService.get("token.refresh.used"));
         }
 
-        token.setUsed(true);
-        refreshTokenRepository.save(token);
-
         User user = userRepository.findById(token.getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.not.found")));
+        if (oneSingleSignOn) {
+            // Get the most recent token for this user
+            List<RefreshToken> tokens = refreshTokenRepository.findByUserOrderByExpiryDateDesc(user);
+            if (tokens.isEmpty() || !tokens.getFirst().getTokenHash().equals(hashedToken)) {
+                throw new BadRequestException(localizationService.get("token.refresh.invalid.latest"));
+            }
+        }
+
+        token.setUsed(true);
+        refreshTokenRepository.save(token);
 
         String jwt = jwtService.generateToken(user);
         String encodedToken = TokenUtils.hashedToken(jwt);

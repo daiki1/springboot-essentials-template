@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface  RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByTokenHash(String tokenHash);
 
+    List<RefreshToken> findByUserOrderByExpiryDateDesc(User user);
+
     @Modifying
     @Query("DELETE FROM RefreshToken r WHERE r.used = true OR r.expiryDate < :cutoff")
     void deleteAllExpiredOrUsedBefore(@Param("cutoff") Instant cutoff);
