@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
                 userRepository.save(user);
             } else {
                 auditLogService.logAudit(user.getId(), "ACCOUNT LOCKED", "Account is locked.");
-                throw new LockedException(localizationService.get("exception.user.accounbt.locked"));
+                throw new LockedException(localizationService.get("exception.user.account.locked"));
             }
         }
 

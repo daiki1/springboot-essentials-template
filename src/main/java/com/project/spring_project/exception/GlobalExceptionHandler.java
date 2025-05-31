@@ -278,7 +278,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleLockedException(LockedException ex) {
         logError("LockedException", ex.getMessage());
         return new ResponseEntity<>(
-                buildErrorResponse(HttpStatus.LOCKED, localizationService.get("exception.user.accounbt.locked")),
+                buildErrorResponse(HttpStatus.LOCKED, localizationService.get("exception.user.account.locked")),
                 HttpStatus.LOCKED // HTTP 423 Locked
         );
     }

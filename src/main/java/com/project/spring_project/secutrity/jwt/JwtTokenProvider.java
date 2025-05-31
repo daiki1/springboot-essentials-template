@@ -1,5 +1,6 @@
 package com.project.spring_project.secutrity.jwt;
 
+import com.project.spring_project.entity.user.Role;
 import com.project.spring_project.entity.user.User;
 import com.project.spring_project.secutrity.services.CustomUserDetails;
 import io.jsonwebtoken.*;
@@ -76,8 +77,6 @@ public class JwtTokenProvider {
      */
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + jwtExpirationInMs);
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
@@ -85,17 +84,7 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("roles", roles)
-                .claim("userId", user.getId())
-                .claim("email", user.getEmail())
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .setIssuer(jwtIssuer)          // Add issuer
-                .setAudience(jwtAudience)      // Add audience
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+        return generateJwtToken(username, roles, user.getId(), user.getEmail());
     }
 
     /**
@@ -107,13 +96,29 @@ public class JwtTokenProvider {
      * @return the generated JWT token
      */
     public String generateToken(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
+
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
                 .collect(Collectors.toList());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+        return generateJwtToken(user.getUsername(), roles, user.getId(), user.getEmail());
+    }
 
-        return generateToken(authentication); // delegate to your existing method
+    public String generateJwtToken(String username, List<String> roles, Long userId, String email) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + jwtExpirationInMs);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("roles", roles)
+                .claim("userId", userId)
+                .claim("email", email)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .setIssuer(jwtIssuer)
+                .setAudience(jwtAudience)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     /**
