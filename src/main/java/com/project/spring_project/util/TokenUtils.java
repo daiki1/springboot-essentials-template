@@ -25,4 +25,13 @@ public class TokenUtils {
             throw new RuntimeException("Error hashing token", e);
         }
     }
+
+    public static String generateRandomCode(int i) {
+        StringBuilder code = new StringBuilder();
+        for (int j = 0; j < i; j++) {
+            int digit = (int) (Math.random() * 10); // Generate a random digit from 0 to 9
+            code.append(digit);
+        }
+        return code.toString();
+    }
 }

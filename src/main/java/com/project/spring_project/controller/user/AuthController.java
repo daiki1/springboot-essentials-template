@@ -67,18 +67,18 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "Invalid password format")
             }
     )
-    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.ok(localizationService.get("user.registered"));
     }
 
     /**
-     * Public endpoint for requesting a password reset
+     * Public endpoint for requesting a password reset, which sends a reset email to the user or a code to reset the password
      *
-     * @param request the request containing the email address for password reset
+     * @param request the request containing the email address for password reset and whether to send a code or an email
      * @return a response entity indicating that the password reset email has been sent
      */
-    @Operation(summary = "Request password reset",
+    @Operation(summary = "Request password reset email link or code",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Password reset email sent",
                             links = {
@@ -90,8 +90,8 @@ public class AuthController {
             }
     )
     @PostMapping("/request-password-reset")
-    public ResponseEntity<?> requestReset(@RequestBody EmailRequest request) {
-        authService.requestPasswordReset(request.getEmail());
+    public ResponseEntity<?> requestReset(@Valid @RequestBody EmailRequest request) {
+        authService.requestPasswordReset(request.getEmail(), request.isSendAsCode());
         return ResponseEntity.ok(localizationService.get("user.password.reset.sent"));
     }
 
@@ -114,7 +114,7 @@ public class AuthController {
             }
     )
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok(localizationService.get("user.password.reset"));
     }

@@ -16,4 +16,6 @@ public class EmailRequest {
     @Email
     @NotBlank
     private String email;
+
+    private boolean sendAsCode = false;
 }

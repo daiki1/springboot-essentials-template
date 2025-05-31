@@ -1,5 +1,6 @@
 package com.project.spring_project.secutrity.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.spring_project.secutrity.services.RateLimitingService;
 import com.project.spring_project.util.LocalizationService;
 import jakarta.servlet.FilterChain;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
+
+import static com.project.spring_project.util.ErrorResponseUtil.buildErrorResponse;
 
 @Component
 @RequiredArgsConstructor
@@ -65,7 +69,15 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
             if (!allowed) {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                response.getWriter().write(localizationService.get("exception.too.many.requests"));
+                response.setContentType("application/json");
+
+                Map<String, Object> errorBody = buildErrorResponse(
+                        HttpStatus.TOO_MANY_REQUESTS,
+                        localizationService.get("exception.too.many.requests")
+                );
+
+                String json = new ObjectMapper().writeValueAsString(errorBody);
+                response.getWriter().write(json);
                 return;
             }
         }

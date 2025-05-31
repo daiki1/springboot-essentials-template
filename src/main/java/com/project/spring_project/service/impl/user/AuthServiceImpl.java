@@ -142,20 +142,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * This method is used to request a password reset.
+     * This method is used to request a password reset. It generates a token or a code and sends it to the user's email.
      *
      * @param email the email address of the user requesting the password reset
      */
     @Override
-    public void requestPasswordReset(String email) {
+    public void requestPasswordReset(String email, boolean sendAsCode) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.not.found")));
+                .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.email.not.found", email)));
 
         Optional<PasswordResetToken> existing = passwordResetTokenRepository.findByUserId(user.getId());
         existing.ifPresent(passwordResetTokenRepository::delete);
 
         String token = UUID.randomUUID().toString();
         LocalDateTime expiry = LocalDateTime.now().plusMinutes(30);
+        if (sendAsCode) {
+            //Send a n-digit code instead of a link
+            token = TokenUtils.generateRandomCode(5);
+            expiry = LocalDateTime.now().plusMinutes(5); // Shorter expiry for code
+        }
 
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);
@@ -165,12 +170,15 @@ public class AuthServiceImpl implements AuthService {
         passwordResetTokenRepository.save(resetToken);
 
         // For now: log it. In prod, send email.
-        System.out.println("Password reset link: https://your-app.com/reset-password?token=" + token);
+        String message = sendAsCode
+                ? localizationService.get("user.password.code.message", token)
+                : localizationService.get("user.password.link.message", "https://your-app.com/reset-password?token=" + token);
+        System.out.println(message);
         try {
             emailService.sendPlainTextEmail(
                     user.getEmail(),
                     localizationService.get("user.password.request"),
-                    localizationService.get("user.password.link.message", "https://your-app.com/reset-password?token=" + token)
+                    message
             );
         } catch (MailException e) {
             throw new EmailSendException("exception.email.send.failed", e);

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -82,8 +83,11 @@ public class GlobalExceptionHandler {
         String errorMessage = localizationService.get("validation.failed");
 
         if (ex instanceof MethodArgumentNotValidException manvEx) {
-            errorMessage = manvEx.getBindingResult().getFieldErrors().stream()
+            /*errorMessage = manvEx.getBindingResult().getFieldErrors().stream()
                     .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                    .collect(Collectors.joining("; "));*/
+            errorMessage = manvEx.getBindingResult().getFieldErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining("; "));
         } else if (ex instanceof HandlerMethodValidationException hmveEx) {
             errorMessage = hmveEx.getAllErrors().stream()
