@@ -52,13 +52,13 @@ public class AuthServiceImpl implements AuthService {
     /**
      * This method is used to authenticate a user and generate a JWT token.
      *
-     * @param request the authentication request containing username and password
+     * @param request the authentication request containing username/email and password
      * @return AuthResponse containing the JWT token and refresh token
      */
     @Override
     @Transactional
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsernameOrEmail(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(localizationService.get("user.not.found")));
 
         if (user.isAccountLocked()) {

@@ -24,10 +24,10 @@ public class AuthController {
     /**
      * Public endpoint for user login
      *
-     * @param request the login request containing email and password
+     * @param request the login request containing user or email and password
      * @return a response entity containing the authentication response
      */
-    @Operation(summary = "User login",
+    @Operation(summary = "User login with email or username and password",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Login successful",
                             links = {
