@@ -10,6 +10,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static com.project.spring_project.util.ErrorResponseUtil.buildErrorResponse;
 
@@ -39,12 +40,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             message = exception.getMessage();
         }
 
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getOutputStream().println(
+
+        PrintWriter writer = response.getWriter(); // Respects UTF-8
+        writer.write(
                 new ObjectMapper().writeValueAsString(
-                    buildErrorResponse(HttpStatus.UNAUTHORIZED, message)
+                        buildErrorResponse(HttpStatus.UNAUTHORIZED, message)
                 )
         );
+        writer.flush();
     }
 }

@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
      * @throws IOException      if an I/O error occurs
      * @throws ServletException if a servlet error occurs
      */
-    @Override
+    /*@Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         String jwt = getJwtFromRequest((HttpServletRequest) request);
@@ -63,6 +63,68 @@ public class JwtAuthenticationFilter extends GenericFilter {
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails((HttpServletRequest) request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        chain.doFilter(request, response);
+    }*/
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        try {
+            String jwt = getJwtFromRequest(httpRequest);
+
+            if (!StringUtils.hasText(jwt)) {
+                chain.doFilter(request, response); // No token = proceed (possibly to public endpoint)
+                return;
+            }
+
+            // Token is present — validate it
+            if (!tokenProvider.validateToken(jwt)) {
+                // Token invalid or expired — respond with 401
+                authenticationEntryPoint.commence(
+                        httpRequest,
+                        httpResponse,
+                        new JwtAuthenticationException(localizationService.get("exception.invalid.expired.session"))
+                );
+                return;
+            }
+
+            // Token is valid — load user
+            String username = tokenProvider.getUsernameFromJWT(jwt);
+            CustomUserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // Optional: One-session check
+            String activeToken = userDetails.getUser().getActiveToken();
+            if (oneSingleSignOn &&
+                    (activeToken == null || !TokenUtils.hashedToken(jwt).equals(activeToken))) {
+                SecurityContextHolder.clearContext();
+                authenticationEntryPoint.commence(
+                        httpRequest,
+                        httpResponse,
+                        new JwtAuthenticationException(localizationService.get("exception.invalid.expired.session"))
+                );
+                return;
+            }
+
+            // Authenticated successfully
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (JwtAuthenticationException ex) {
+            authenticationEntryPoint.commence(httpRequest, httpResponse, ex);
+            return;
+        } catch (Exception ex) {
+            authenticationEntryPoint.commence(
+                    httpRequest, httpResponse,
+                    new JwtAuthenticationException("Unexpected error during authentication: " + ex.getMessage())
+            );
+            return;
         }
 
         chain.doFilter(request, response);

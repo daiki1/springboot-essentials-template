@@ -188,6 +188,29 @@ springdoc.api-docs.enabled=false
 ```
 </details>
 
+### Character Encoding Note (for internationalization / i18n)
+
+If you're seeing **incorrect characters (e.g., `�` or `∩┐╜`)** in responses from localized messages (`messages.properties`), make sure your project and IDE are properly configured to use **UTF-8** encoding.
+
+#### IntelliJ IDEA Setup
+
+To prevent IntelliJ from escaping special characters automatically (like `á`, `ñ`, `é`) in `.properties` files:
+
+1. Open **Settings / Preferences → Editor → File Encodings**
+2. Set the following:
+  - **Global Encoding:** `UTF-8`
+  - **Project Encoding:** `UTF-8`
+  - **Default encoding for properties files:** `UTF-8`
+3. **Uncheck** this option:
+4. Restart IntelliJ if needed.
+> This ensures that `.properties` files are saved and interpreted correctly using UTF-8, so you can use accented characters directly:
+>
+> ```properties
+> exception.invalid.expired.session=Sesión inválida o expirada.
+> ```
+
+This avoids the need to use escaped Unicode sequences like `\u00F3` and ensures messages are displayed correctly in APIs or front-end apps.
+
 ## Production Considerations
 <details>
 <summary>Click to open: This section includes helpful notes, practices, and important instructions to consider once the application is in production.</summary>
