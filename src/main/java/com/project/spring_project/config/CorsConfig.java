@@ -31,7 +31,7 @@ public class CorsConfig {
         //You can test if its working by using the following command and uncommenting the line above "http://yourdomain.com"
         // curl -H "Origin: http://yourdomain.com" --verbose http://localhost:8080/api/test/all
 
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L); // Cache preflight requests

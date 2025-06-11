@@ -32,6 +32,7 @@ public interface  UserMapper {
             @Mapping(target = "locked", source = "accountLocked"),
             @Mapping(target = "lockedTime", source = "lockTime"),
             @Mapping(target = "language", source = "language"),
+            @Mapping(target = "createdAt", source = "createdAt")
     })
     UserDto toDto(User user);
 

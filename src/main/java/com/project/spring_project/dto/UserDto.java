@@ -22,6 +22,6 @@ public class UserDto {
     private boolean locked;
     private LocalDateTime lockedTime;
     private String language;
-
+    private LocalDateTime createdAt;
 
 }
