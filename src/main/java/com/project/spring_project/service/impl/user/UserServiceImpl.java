@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
             user.setUsername(request.getUsername());
         }
 
-        auditLogService.logAudit(user.getId(), "UPDATE_USER", "Update user from " + oldUserJson + " to " + JsonUtils.objectToJsonNotNulls(request));
+        auditLogService.logAudit(user, "UPDATE_USER", "Update user from " + oldUserJson + " to " + JsonUtils.objectToJsonNotNulls(request));
 
         return userMapper.toDto(userRepository.save(user));
     }
@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         // Log the role change
-        auditLogService.logAudit(user.getId(), "ROLE_CHANGE", "Role changed from " + oldRolesJson + " to " + JsonUtils.objectToJson(roles));
+        auditLogService.logAudit(user, "ROLE_CHANGE", "Role changed from " + oldRolesJson + " to " + JsonUtils.objectToJson(roles));
     }
 
     /**

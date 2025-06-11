@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20250609-01-add-resource-ipaddress
+      author: Omar
+      changes:
+        - addColumn:
+            tableName: audit_log
+            columns:
+              - column:
+                  name: resource
+                  type: varchar(255)
+              - column:
+                  name: ip_address
+                  type: varchar(45)

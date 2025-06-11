@@ -1,5 +1,6 @@
 package com.project.spring_project.controller;
 
+import com.project.spring_project.dto.AuditLogDto;
 import com.project.spring_project.entity.AuditLog;
 import com.project.spring_project.service.AuditLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,9 +34,9 @@ public class AuditController {
                     @ApiResponse(responseCode = "403", description = "Access denied")
             }
     )
-    @PreAuthorize("hasRole('AUDITOR')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')")
     @GetMapping("/audit-logs")
-    public Page<AuditLog> getAuditLogs(@PageableDefault(size = 20, sort = "timestamp", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<AuditLogDto> getAuditLogs(@PageableDefault(size = 20, sort = "timestamp", direction = Sort.Direction.DESC) Pageable pageable) {
         return auditLogService.getAllAuditLogs(pageable);
     }
 }

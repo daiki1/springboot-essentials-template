@@ -69,7 +69,8 @@ public class AuthServiceImpl implements AuthService {
                 user.setLockTime(null);
                 userRepository.save(user);
             } else {
-                auditLogService.logAudit(user.getId(), "ACCOUNT LOCKED", "Account is locked.");
+
+                auditLogService.logAudit(user, "ACCOUNT LOCKED", "Account is locked.");
                 throw new LockedException(localizationService.get("exception.user.account.locked"));
             }
         }
@@ -96,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
             RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(user);
 
-            auditLogService.logAudit(user.getId(), "LOGIN", "User successfully logged in.");
+            auditLogService.logAudit(user, "LOGIN", "User successfully logged in.");
             return new AuthResponse(token, refreshToken.getRawToken());
         } catch (BadCredentialsException ex) {
             int newFailAttempts = user.getFailedAttempts() + 1;
@@ -227,7 +228,7 @@ public class AuthServiceImpl implements AuthService {
             refreshTokenRepository.deleteByUser(user);
             userRepository.delete(user);
         }
-        auditLogService.logAudit(userId, "USER_DELETION", "User deleted: " + username);
+        auditLogService.logAudit(user, "USER_DELETION", "User deleted: " + username);
 
     }
 

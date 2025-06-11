@@ -16,3 +16,5 @@ databaseChangeLog:
       file: db/changelog/schema/changelog-005-user-language.yaml
   - include:
       file: db/changelog/schema/changelog-006-country-state-city.yaml
+  - include:
+      file: db/changelog/schema/changelog-007-add-audit-fields.yaml

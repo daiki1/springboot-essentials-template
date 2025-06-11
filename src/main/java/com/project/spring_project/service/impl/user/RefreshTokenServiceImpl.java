@@ -107,7 +107,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     /**
      * Deletes all refresh tokens associated with the user.
      *
-     * @param user The user whose refresh tokens are to be deleted.
      */
     @Override
     @Scheduled(cron = "0 0 3 * * ?") // Runs daily at 3 AM

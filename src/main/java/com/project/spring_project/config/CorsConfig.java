@@ -22,6 +22,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
+                "http://localhost:8081"            // React frontend
                 //"http://localhost:4200",         // Angular/React dev
                 //"http://yourdomain.com",         // Same server
                 //"http://another-frontend.com",   // External server

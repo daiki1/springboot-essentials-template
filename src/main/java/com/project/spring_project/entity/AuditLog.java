@@ -1,5 +1,6 @@
 package com.project.spring_project.entity;
 
+import com.project.spring_project.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,8 +18,9 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "operation")
     private String operation; // e.g., "LOGIN", "ROLE_CHANGE", "USER_DELETION"
@@ -29,4 +31,8 @@ public class AuditLog {
     @Column(name = "details")
     private String details; // Any additional info, e.g., the old and new roles, IP address
 
+    private String resource;
+
+    @Column(name = "ip_address")
+    private String ipAddress;
 }
