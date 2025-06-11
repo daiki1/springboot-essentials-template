@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(localizationService.get("user.not.found")));
 
-        String oldUserJson = JsonUtils.objectToJson(user);
+        String oldUserJson = JsonUtils.objectToJsonNotNulls(user);
 
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
             user.setEmail(request.getEmail());
@@ -156,13 +156,13 @@ public class UserServiceImpl implements UserService {
             roles.add(role);
         }
 
-        String oldRolesJson = JsonUtils.objectToJson(user.getRoles());
+        String oldRolesJson = JsonUtils.objectToJsonNotNulls(user.getRoles());
 
         user.setRoles(roles);
         userRepository.save(user);
 
         // Log the role change
-        auditLogService.logAudit(user, "ROLE_CHANGE", "Role changed from " + oldRolesJson + " to " + JsonUtils.objectToJson(roles));
+        auditLogService.logAudit(user, "ROLE_CHANGE", "Role changed from " + oldRolesJson + " to " + JsonUtils.objectToJsonNotNulls(roles));
     }
 
     /**
