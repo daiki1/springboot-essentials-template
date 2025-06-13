@@ -1,9 +1,11 @@
 package com.project.spring_project.controller.user;
 
+import com.project.spring_project.dto.RoleDTO;
 import com.project.spring_project.dto.UserDto;
 import com.project.spring_project.dto.request.ChangeRolesRequest;
 import com.project.spring_project.dto.request.UserStatusUpdateRequest;
 import com.project.spring_project.dto.request.UserUpdateRequest;
+import com.project.spring_project.service.user.RoleService;
 import com.project.spring_project.util.LocalizationService;
 import com.project.spring_project.service.user.UserService;
 import com.project.spring_project.util.SupportedLanguages;
@@ -19,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,6 +31,7 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private final LocalizationService localizationService;
+    private final RoleService roleService;
 
     /**
      * Retrieves a paginated list of all users.
@@ -160,6 +164,23 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public void updateStatus(@PathVariable Long id, @Valid @RequestBody UserStatusUpdateRequest request) {
         userService.updateUserStatus(id, request.getActive());
+    }
+
+    /**
+     * Retrieves all available roles.
+     *
+     * @return a list of RoleDTO objects representing all roles
+     */
+    @Operation(summary = "Get all roles", description = "Retrieves all available roles.",
+        responses = {
+                @ApiResponse(responseCode = "200", description = "Roles retrieved successfully"),
+                @ApiResponse(responseCode = "403", description = "Access denied")
+        }
+    )
+    @GetMapping("/roles")
+    @PreAuthorize("hasRole('ADMIN')") // Optional: Restrict access to admins
+    public List<RoleDTO> getRoles() {
+        return roleService.getAllRoles();
     }
 
     /**
