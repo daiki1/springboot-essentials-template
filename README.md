@@ -105,7 +105,28 @@ The application can be run using Maven. Make sure you have the required dependen
 ``` bash
 mvn spring-boot:run
 ```
-### 5. Refresh token
+
+### 5. Or Running with Docker
+
+This project includes a Dockerfile a docker of your choice.
+I'm using https://www.docker.com/products/docker-desktop/ Docker Desktop for Winddows.
+
+By default, the app connects to a local MySQL instance.
+If running inside Docker it will use the application-docker.properties file, which is configured to connect to a MySQL using docker host's MySQL instance.
+
+Remember to run your docker software before running the application.
+
+#### 1. Build the project (locally)
+```bash
+mvn clean package -DskipTests
+docker build -t springboot-essentials-template .
+```
+#### 2. Run the Container
+```bash
+docker run -p 8080:8080 springboot-essentials-template
+```
+
+### 6. Refresh token
 - The application uses JWT for authentication. The token is valid for 15 minutes by default.
 - You can refresh the token using the `/api/auth/refresh` endpoint.
 - The refresh token is valid for 7 days by default.
