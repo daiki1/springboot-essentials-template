@@ -79,8 +79,17 @@ Production-ready Spring Boot REST API project to kickstart any backend applicati
 git clone https://github.com/daiki1/springboot-essentials-template.git
 cd springboot-essentials-template
 ```
+### 2. Create file `mail-secrets.properties`
+The file contains the email configuration for sending emails, such as password reset emails.
+- Create a file named `mail-secrets.properties` in the `src/main/resources` directory.
+- Add the following properties to the file:
+``` properties
+gmail.from=youremail@mail.com
+gmail.username=youremail@mail.com
+gmail.password=mysecretpassword
+```
 
-### 2. Configure the Database
+### 3. Configure the Database
 - Database will be created automatically if it does not exist.
 - Update the `application.properties` file with your database credentials.
 - User table will be created automatically. The first user is admin with role `ROLE_ADMIN` and no password.
@@ -91,7 +100,7 @@ spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
 
-### 3. Configurable session login for users
+### 4. Configurable session login for users
 - You can configure the session login in `application.properties` file.
 - By default, the application is configured to allow only one session per user. If you want to allow multiple sessions, set the following property to `false`:
 - When login in with a new session, the old session will be invalidated if the following property is `true`
@@ -99,14 +108,14 @@ spring.datasource.password=your_password
 app.oneSingleSignOn=false
 ```
 
-### 4. Run the application
+### 5. Run the application
 
 The application can be run using Maven. Make sure you have the required dependencies installed.
 ``` bash
 mvn spring-boot:run
 ```
 
-### 5. Or Running with Docker
+### 6. Or Running with Docker
 
 This project includes a Dockerfile a docker of your choice.
 I'm using https://www.docker.com/products/docker-desktop/ Docker Desktop for Winddows.
